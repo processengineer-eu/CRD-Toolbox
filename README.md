@@ -1,9 +1,5 @@
 # <img src="./Images/LogoCRT_3D_Klein.png " width="100"/> The Chemical Reactor Design Toolbox
 
-## Name 
-
-The Chemical Reactor Design Toolbox
-
 ## Motivation
 
 A fundamental knowledge and a basic understanding of the interactions
@@ -18,7 +14,7 @@ innovative, creative and playful approach.
 ## Description
 
 This toolbox is implemented as a custom library for the
-MATLAB&reg/Simscape&reg framework consisting of basic blocks. Each
+MATLAB&reg;/Simscape&reg; framework consisting of basic blocks. Each
 block represents either a balancing control volume, a physical
 transport process (for mass, heat and momentum), a source/sink due to
 a chemical reaction or a thermodynamic phase equilibrium. A
