@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="100"
+      viewBox="0 0 200 100"
+      >
+  <g  d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="100"
+	  fill="none" stroke="black" stroke-width="5" />
+    <rect x="135" y="32" width="35" height="35"
+	  fill="none" stroke="black" stroke-width="2" />
+    <circle cx="40" cy="50" r="15"
+   	  fill="none" stroke="black" stroke-width="2" />
+    <polyline points="55,50 110,50"
+	      fill="none" stroke-width="2" stroke="black" />   
+    <polyline points="110,50 110,40 130,50 110,60 110,50" 
+	      fill="black" stroke-width="2" stroke="black" />
+   </g>
+</svg>

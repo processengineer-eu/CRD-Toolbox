@@ -1,0 +1,114 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+
+component Database
+  % Database Liquid: 1.5 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 17.11.2025
+      
+  nodes
+    Port_B = Liquid(...
+      model = model,...
+      N = N,...
+      Ids = Ids,...
+      Mw = Mw,...
+      charge = charge,...
+      table_T = table_T,...
+      table_cp = table_cp,...
+      table_Vm = table_Vm,...
+      table_H = table_H,...
+      table_G = table_G,...
+      table_mu = table_mu,...
+      table_lambda = table_lambda,...
+      table_Hv = table_Hv,...
+      table_pvap = table_pvap,...
+      A = A,...
+      alpha = alpha,...
+      F_nom = F_nom,....
+      Phi_nom = Phi_nom,...
+      H_nom = H_nom); %
+    end
+
+  annotations
+    Icon = './Properties.svg';
+    Port_B : Side = right;
+    UILayout = [...
+      UIGroup('Thermodynamics',model),...
+      UIGroup('Species',numSpecies,A1,A2,A3,A4,A5),...
+      UIGroup('LookUpTables',Tmin,Tmax,nT),...
+      UIGroup('Nominal Values',F_nom,Phi_nom,H_nom)];
+  end
+  
+  parameters
+    model = ThermodynamicModel.Ideal;  % Thermodynamic Model
+    numSpecies = NumberOfSpecies.two;   % Number of Species
+    Tmin = {297.15,'K'};               % Minimum Temperature
+    Tmax = {373.15,'K'};               % Maximum Temperature
+    nT = {10,'1'};                     % Number of Temperature Levels
+    F_nom = {1.0e-06,'mol/s'};         % Nominal Value for Molar Flow Rates
+    Phi_nom = {1.0,'W'};               % Nominal Value for Energy Flow Rate
+    H_nom = {1.0e+02,'kJ/mol'};        % Nominal Value for Enthalpies
+  end
+
+  parameters (ExternalAccess = none)
+    A1 = SpeciesName.H2O; % A1
+    A2 = SpeciesName.H2O; % A2
+    A3 = SpeciesName.None; % A3
+    A4 = SpeciesName.None; % A4
+    A5 = SpeciesName.None; % A5
+  end
+    
+  if(numSpecies == 2)
+    annotations
+      [A1,A2] : ExternalAccess = modify;
+    end
+    parameters
+      N = {2,'1'};
+    end
+  elseif(numSpecies == 3)
+    annotations
+      [A1,A2,A3] : ExternalAccess = modify;
+    end
+    parameters
+      N = {3,'1'};
+    end 
+  elseif(numSpecies == 4)
+    annotations
+      [A1,A2,A3,A4] : ExternalAccess = modify;
+    end
+    parameters
+      N = {4,'1'};
+    end  
+  elseif(numSpecies == 5)
+    annotations
+      [A1,A2,A3,A4,A5] : ExternalAccess = modify;
+    end
+    parameters
+      N = {5,'1'};
+    end
+  end
+    
+  parameters(Access = private)
+    [Ids,tmp_Mw,tmp_charge,tmp_table_T,tmp_table_cp,tmp_table_H,...
+      tmp_table_G,tmp_table_Vm,tmp_table_mu,tmp_table_lambda,...
+      tmp_table_Hv,tmp_table_pvap,tmp_A,alpha] = ...
+      checkLiquidSpecies5(model,value(Tmin,'K'),value(Tmax,'K'),nT,N,A1,A2,A3,A4,A5);
+    Mw = {tmp_Mw,'g/mol'};
+    charge = {tmp_charge,'1'};
+    table_T = {tmp_table_T,'K'};
+    table_H = {tmp_table_H,'kJ/mol'};
+    table_G = {tmp_table_G,'kJ/mol'};
+    table_cp = {tmp_table_cp,'J/(mol*K)'};
+    table_Vm = {tmp_table_Vm,'l/mol'};
+    table_mu = {tmp_table_mu,'Pa*s'};
+    table_lambda = {tmp_table_lambda,'W/(m*K)'};
+    table_Hv = {tmp_table_Hv,'kJ/mol'};
+    table_pvap = {tmp_table_pvap,'Pa'};
+    A = {tmp_A,'cal/mol'};
+  end
+
+end
+
+
+

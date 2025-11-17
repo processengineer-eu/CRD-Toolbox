@@ -1,0 +1,79 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Interface.*;
+import ChemReactorDesign.Basic.Interface.enum.*;
+
+component Database
+  % Database Interface : 1.5 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 05.0.2025
+      
+  nodes
+    Port_B = Interface(...
+      N = N,...
+      Ids = Ids,...
+      Mw = Mw,...
+      Am = Am,...
+      F_nom = F_nom); %
+  end
+
+  annotations
+    Icon = './Properties.svg';
+    Port_B : Side = right;
+    UILayout = [...
+      UIGroup('Species',numSpecies,A1,A2,A3,A4,A5),...
+      UIGroup('Numerics',F_nom)];
+  end
+  
+  parameters
+    numSpecies = NumberOfSpecies.two;   % Number of Species
+    F_nom = {1.0e-06,'mol/s'};         % Nominal Value for Molar Flow Rates
+  end
+
+  parameters (ExternalAccess = none)
+    A1 = SpeciesName.N2; % A1
+    A2 = SpeciesName.O2; % A2
+    A3 = SpeciesName.None; % A3
+    A4 = SpeciesName.None; % A4
+    A5 = SpeciesName.None; % A5
+  end
+    
+  if(numSpecies == 2)
+    annotations
+      [A1,A2] : ExternalAccess = modify;
+    end
+    parameters
+      N = {2,'1'};
+    end
+  elseif(numSpecies == 3)
+    annotations
+      [A1,A2,A3] : ExternalAccess = modify;
+    end
+    parameters
+      N = {3,'1'};
+    end 
+  elseif(numSpecies == 4)
+    annotations
+      [A1,A2,A3,A4] : ExternalAccess = modify;
+    end
+    parameters
+      N = {4,'1'};
+    end  
+  elseif(numSpecies == 5)
+    annotations
+      [A1,A2,A3,A4,A5] : ExternalAccess = modify;
+    end
+    parameters
+      N = {5,'1'};
+    end
+  end
+    
+  parameters(Access = private)
+    [Ids,tmp_Mw,tmp_Am] = checkInterfaceSpecies5(N,A1,A2,A3,A4,A5);
+    Mw = {tmp_Mw,'g/mol'};
+    Am = {tmp_Am,'m^2/mol'};
+  end
+
+end
+
+
+

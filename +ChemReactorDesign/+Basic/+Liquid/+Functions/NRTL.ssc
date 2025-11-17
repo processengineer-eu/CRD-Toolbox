@@ -1,0 +1,24 @@
+function gamma = NRTL(A,alpha,x,T)
+  %% Activity coefficients according to the NRTL model after [Beneke:2013]
+  %
+  % (c) Klaus Schnitzlein - 03.04.2025
+  
+  definitions
+    N = length(x);
+    R = {8.3143,'J/(mol*K)'};
+    tau = A./(R*T);
+    G = exp(-alpha.*tau);
+    zb = repmat(transpose(x),N,1).*transpose(G);
+    za = repmat(transpose(x),N,1).*transpose(tau).*transpose(G);
+    zf = repmat(transpose(x),N,1).*G;
+    sa = sum(za,2);
+    sb = sum(zb,2);
+    sab = sa./sb;
+    d = zf./repmat(transpose(sb),N,1).*(tau-repmat(transpose(sab),N,1));
+    gamma = exp(sa./sb+sum(d,2));
+  end
+
+end
+
+
+

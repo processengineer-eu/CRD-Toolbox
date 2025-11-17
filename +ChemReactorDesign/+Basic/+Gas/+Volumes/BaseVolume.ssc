@@ -1,0 +1,84 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.Gas.enum.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+component (Hidden=true) BaseVolume
+  % BaseVolume : 1.0 : fixed
+  % Base Class for Volumes
+  %
+  %   (c) Klaus Schnitzlein - 05.08.2025
+
+  outputs(ExternalAccess = none)
+  
+    Vout = {0,'l'}; % V
+  end
+
+  nodes
+    Port_A = Gas;  %
+    Port_C = foundation.thermal.thermal;  %
+  end
+
+  annotations
+    Port_A : Side = left;
+    Port_C : Side = bottom;
+    Vout : Side = top;
+    H : LoggingUnit = 'kJ/mol';
+  end
+
+  parameters
+    isothermalOperation = OnOff.On;  % Isothermal Operation
+    compressionWork = OnOff.On;      % Compression Work
+    V0 = {1,'l'};          % Volume
+    x0 = {[0;1],'1'};      % Initial Mole Fractions
+    p0 = {1.0,'bar'};      % Initial Pressure
+    T0 = {298.15,'K'};     % Initial Temperature
+  end
+   
+  parameters(Access = protected)
+    N = Port_A.N;
+    xx = reshape(x0,N,1);
+    row_x0 = [xx(1:N-1);1-sum(xx(1:N-1))];
+  end
+
+  if(isothermalOperation == OnOff.On)
+    annotations
+      Port_C : ExternalAccess = none;
+    end
+  end  
+
+  variables(Access = protected)
+    F = {value = {zeros(N,1),'mol/s'},nominal = Port_A.F_nom};
+    Phi = {value = {0,'kJ/s'},nominal = Port_A.Phi_nom};
+    Q = {value = {0,'W'},nominal = Port_A.Q_nom};
+    T = {value = T0,priority = priority.high}; 
+  end
+
+  branches
+    F : Port_A.F -> *; 
+    Phi : Port_A.Phi -> *;
+    Q : Port_C.Q -> *;
+  end
+
+  intermediates
+    R = Port_A.R;
+    cp = getProperty_T(Port_A.table_T,Port_A.table_cp,T);
+    phi = Port_A.phi;
+    Hres = Port_A.Hres;
+    z = Port_A.z;
+    H = Port_A.H;
+  end
+
+  equations
+    Port_A.T == T;
+    Port_C.T == T;
+        
+    assert(length(x0) == N);
+    assert(abs(sum(x0)-1) < 1.0e-03,...
+      'invalid mole fractions -> sum(x(i)) != 1');
+    assert(sum(1*(x0<0)) == 0,...
+      'invalid mole fractions -> x(i) < 0'); 
+  end
+
+end

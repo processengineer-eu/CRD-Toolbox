@@ -1,0 +1,32 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component DiffusionK < BaseDiffusion
+  % Knudsen Diffusion : 1.5
+  % Diffusive Mass Transport according to Knudsen
+  %
+  %   (c) Klaus Schnitzlein - 26.06.2024
+
+  annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',Dk)];
+  end
+  
+  parameters
+    Dk = {ones(2,1),'m^2/s'};  % Knudsen Diffusion Coefficients
+  end
+  
+  equations
+    assert(length(D) == N);
+  end
+
+  intermediates
+    D = reshape(Dk,N,1);
+  end
+
+  equations
+    J == -D/(R*T).*gradpi;
+  end
+end

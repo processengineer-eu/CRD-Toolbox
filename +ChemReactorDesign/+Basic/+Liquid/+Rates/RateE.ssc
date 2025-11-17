@@ -1,0 +1,78 @@
+import ChemReactorDesign.Basic.Liquid.Rates.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+
+component RateE < BaseRate(reversibility = Reversibility.Reversible,...
+    rateReference = RateReference.Area)
+  % RateE : 1.5
+  % Electrochemical Reaction Rate (with zero-crossing prevention)
+  %
+  %   (c) Klaus Schnitzlein - 13.05.2025
+
+  nodes
+    Port_p = foundation.electrical.electrical; % +
+    Port_n = foundation.electrical.electrical; % -
+  end
+
+  annotations
+    Icon = './RateE.svg';
+    [Port_p,Port_n] : Side = bottom;
+    kfinfA : ExternalAccess = modify;
+    [calculate_Ka,Ka0,rateReference,reversibility,kappaf] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',calculate_U0),...
+      UIGroup('Stoichiometry',nu),...
+      UIGroup('Thermodynamics',U0),...
+      UIGroup('Kinetics',kfinfA,Ea,alpha)];
+  end
+
+  parameters(ExternalAccess = none)
+    U0 = {0,'V'};             % Equilibrium Potential
+  end
+
+  parameters
+    calculate_U0 = OnOff.Off;  % Calculate U0
+    alpha  = {0.5,'1'};        % Factor of Symmetry
+  end
+
+  parameters(Access = private)
+    z = Port_B.charge;
+    n = abs(sum(row_nu.*z));
+  end
+
+  variables(Access=protected)
+    i = {0,'A'};
+  end
+
+  branches
+    i : Port_p.i -> Port_n.i;
+  end
+   
+  if(calculate_U0 == OnOff.On)
+    intermediates
+      t_U0 = -dGr/(n*Port_B.Far);
+    end
+  else
+    annotations
+      U0 : ExternalAccess = modify;
+    end
+    intermediates
+      t_U0 = U0;
+    end
+  end
+    
+  intermediates
+    Far = Port_B.Far;
+    U = Port_p.v - Port_n.v;
+    f = Far/(Port_B.R*T);
+    eta = U - t_U0;
+    kf1 = A*kfinfA*exp(-Ea/(R*T));
+  end
+  
+  equations
+    r == kf1*(exp(-alpha*n*f*eta)*lambdaf*prodf-...
+              exp((1-alpha)*n*f*eta)*lambdab*prodb);
+    i == -Port_B.Far*sum(z.*F);
+ end
+
+end

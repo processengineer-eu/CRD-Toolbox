@@ -1,0 +1,69 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Interface.*;
+
+component (Hidden = true) BaseTransport
+  % Base Class for Interface Mass Transport 
+  %
+  % Copyright Klaus Schnitzlein - 26.06.2025
+   
+  nodes
+    Port_A = Interface; % 
+    Port_B = Interface; % 
+  end
+
+  inputs(ExternalAccess = none)
+    wIn = {0,'m'}; % W
+  end
+
+  outputs(ExternalAccess = none)
+    wOut = {1,'m'}; % W
+  end
+   
+  annotations
+    Port_A : Side = left;
+    Port_B : Side = right;
+    [wIn,wOut] : Side = top;
+  end
+
+  parameters
+    wInputOutput = InOut.Off;   % Width Input/Output
+    w0 = {1,'m'};               % Width
+    delta  = {1.0e-03,'m'};     % Transport Distance
+  end
+
+  parameters(Access = protected)
+    N = Port_A.N;
+  end
+
+  variables(Access = protected)
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_A.F_nom};
+  end
+
+  branches
+    F : Port_A.F -> Port_B.F;
+  end
+
+  intermediates
+    w = if(wInputOutput == InOut.Input)
+      wIn;
+    else
+      w0;
+    end
+  end
+    
+  if(wInputOutput == InOut.Output)
+    annotations
+      wOut : ExternalAccess = modify;
+    end
+  elseif(wInputOutput == InOut.Input)
+    annotations
+      wIn : ExternalAccess = modify;
+      w0 : ExternalAccess = none;
+    end
+  end
+
+  equations
+    wOut == w;
+  end
+end
+      

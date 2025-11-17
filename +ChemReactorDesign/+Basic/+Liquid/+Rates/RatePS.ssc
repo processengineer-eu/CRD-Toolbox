@@ -1,0 +1,64 @@
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Rates.*;
+
+component RatePS < BaseRate
+  % RatePS : 1.5
+  % Heterogeneous (Liquid-Solid) Power Law Reaction Rate 
+  %
+  %  (c) Klaus Schnitzlein - 10.10.2025
+
+  nodes
+    Port_B_S = Solid;  %
+  end
+
+  annotations
+    Icon = './Rate.svg';
+    Port_B_S: Side = right;
+    UILayout = [...
+      UIGroup('Options',reversibility,rateReference,calculate_Ka),...
+      UIGroup('Thermodynamics',Ka0),...
+      UIGroup('Kinetics',kfinfV,kfinfA,kfinfm,Ea),...
+      UIGroup('Liquid',kappaf,nu),...
+      UIGroup('Solid',nu_S)];
+  end
+
+  parameters
+    nu_S = {[-1;0],'1'};  % Stoichiometric Coefficients Solid
+  end
+
+  parameters(Access = private)
+    N_S = Port_B_S.N;
+    row_nu_S = reshape(nu_S,N_S,1);
+  end
+
+  variables(Access=protected)
+    F_S = {zeros(N_S,1),'mol/s'};
+    Phi_S = {0,'W'}
+  end
+
+  branches
+    F_S : * -> Port_B_S.F;
+    Phi_S : * -> Port_B_S.Phi;
+  end
+
+  intermediates
+    x_S = checkMoleFractions(Port_B_S.x); 
+    lambdaf_S = (sum(1*(lt(row_nu_S,0) & le(x_S,eps)))==0);
+    lambdab_S = (sum(1*(gt(row_nu_S,0) & le(x_S,eps)))==0); 
+  end
+
+  equations
+    r == kf*(lambdaf_S*prodf-lambdab_S*prodb/Ka);
+  end
+
+  equations
+    F_S == row_nu_S*r;
+    Phi_S == 0;
+
+    assert(length(nu_S) == N_S);
+  end
+end

@@ -1,0 +1,50 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Interface.*;
+
+component(Hidden = true) BaseTransfer
+  % BaseTransfer : 1.5 : fixed
+  % Base Class for Mass Transfer Rates
+  %
+  %   (c) Klaus Schnitzlein - 24.03.2025
+  
+  nodes
+    Port_B_I = Interface; %
+  end
+
+  parameters(Access = private)
+    N_I = Port_B_I.N;
+  end
+
+  parameters
+    M = {1,'1'};                % Number of Sorption Reactions
+    nu_I = {[1;0],'1'};          % Stoichiometric Cofficients Interface
+  end
+
+  parameters(Access = private)
+    row_nu_I    = reshape(nu_I,N_I,1);
+    snu_I = (1*(row_nu_I ~= 0))'*row_nu_I;
+  end
+
+  equations
+    assert(size(nu_I,1) == N_I && size(nu_I,2) == M,...
+    'invalid number of stoichiometric coefficients for interface phase');
+    assert(sum(sum(1*(nu_I > 0),1)) == M,...
+      'invalid stoichiometric coefficents for interface phase');
+  end
+
+  variables(Access=private)
+    F_I = {zeros(N_I,1),'mol/s'};
+    A = {0,'m^2'};
+    r = {0,'mol/(cm^2*s)'};
+  end
+
+  branches
+    F_I: * -> Port_B_I.F
+  end
+
+  equations
+    F_I == A*row_nu_I*r;
+  end
+
+end

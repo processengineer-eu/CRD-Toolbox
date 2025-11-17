@@ -1,0 +1,100 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Interface.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.Interface.Rates.*;
+
+component RatePG < BaseRate
+  % RatePG : 1.5 
+  % Heterogeneous (Interface) Power Law Reaction Rate
+  %
+  %   (c) Klaus Schnitzlein - 25.06.2025
+
+  nodes
+    Port_B_G = Gas;  % 
+  end
+
+  annotations
+    Icon = './Rate.svg';
+    Port_B_G : Side = right;
+    UILayout = [...
+      UIGroup('Options',temperatureInput,calculate_Ka,reversibility),...
+      UIGroup('Thermodynamics',T0,table_T,table_Ka,Ka0),...
+      UIGroup('Kinetics',kfinfA,Ea),...
+      UIGroup('Gas',nu_G,kappaf_G),...
+      UIGroup('Interface',nu,kappaf)];
+  end
+ 
+  parameters(Access = private)
+    N_G = Port_B_G.N;
+    row_nu_G = reshape(nu_G,N_G,1);
+  end
+
+  parameters
+    nu_G = {[0 0],'1'};   % Stoichiometric Coefficients (Gas)
+  end
+ 
+  equations
+    assert(length(nu_G) == N_G);
+  end
+
+  parameters(ExternalAccess = none)
+    kappaf_G  = {[0;0],'1'};   % Orders of Forward-Reaction (Gas)
+  end
+
+  variables(Access=protected)
+    F_G = {zeros(N_G,1),'mol/s'};
+    Phi_G = {0,'W'};
+  end
+
+  branches
+    F_G : * -> Port_B_G.F;
+    Phi_G : * -> Port_B_G.Phi;
+  end
+  
+  if(reversibility == ChemReactorDesign.Basic.enum.Reversibility.Reversible)
+    parameters(Access = private)
+      [row_kappaf_G,row_kappab_G] = getKappa(row_nu_G);
+    end
+  else
+    annotations
+      kappaf_G : ExternalAccess = modify;
+    end
+    equations
+      assert(length(kappaf_G) == N_G);
+    end
+    parameters(Access = private)
+      row_kappaf_G = reshape(kappaf_G,N_G,1);
+      row_kappab_G = {zeros(N_G,1),'1'};
+    end
+  end
+
+ intermediates
+   p = Port_B_G.p;
+   x = checkMoleFractions(Port_B_G.x)
+   H_G = Port_B_G.H;
+   phi = Port_B_G.phi;
+   a_G = max_noZC(phi.*x*p/{1,'bar'},eps);
+
+   prodf_G = prod(a_G.^row_kappaf_G);
+   lambdaf_G = (sum(1*(eq(row_kappaf_G,0) & lt(row_nu_G,0) & le(a_G,eps)))==0);
+   prodb_G = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      prod(a_G.^row_kappab_G)
+    end;
+    lambdab_G = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      (sum(1*(eq(row_kappab_G,0) & gt(row_nu_G,0) & le(a_G,eps)))==0);
+   end
+ end
+ 
+ equations
+   r == kf*(lambdaf_G*prodf_G*lambdaf*prodf-lambdab_G*prodb_G*lambdab*prodb/Ka);
+   F_G == row_nu_G*r;
+   Phi_G == sum(F_G.*H_G);
+   assert(length(nu_G) == N_G);
+ end
+ 
+end

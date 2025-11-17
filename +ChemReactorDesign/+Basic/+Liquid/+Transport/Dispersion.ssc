@@ -1,0 +1,26 @@
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+
+component Dispersion < BaseDiffusion
+  % Dispersion : 1.5
+  % Dispersive Mass Transport and
+  % Heat Transport by Thermal Convection and Conduction
+  %
+  %   (c) Klaus Schnitzlein - 19.02.2025
+
+  annotations
+    Icon = './Dispersion.svg';
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',Dz)];
+  end
+
+  parameters
+    Dz = {1.0e-06,'m^2/s'};  % Dispersion Coefficient
+  end
+
+  equations
+    J == -Dz*gradc;
+  end
+
+end

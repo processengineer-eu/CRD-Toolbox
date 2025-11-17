@@ -1,0 +1,9 @@
+function y = regSquare(x,delta)
+  % Anti-symmetric square approximation with non-zero derivative in the origin
+  %
+  % (c) Francesco Casella (Modelica Library), Klaus Schnitzlein - 14.03.2025
+
+  definitions
+    y = x*sqrt(x*x+delta*delta);
+  end
+end

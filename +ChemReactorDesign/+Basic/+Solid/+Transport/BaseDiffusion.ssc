@@ -1,0 +1,27 @@
+import ChemReactorDesign.Basic.Solid.Transport.*;
+import ChemReactorDesign.Basic.Solid.enum.*;
+
+component (Hidden = true) BaseDiffusion < BaseTransport
+  % Base Class for Diffusive Transport Mechanisms
+  %
+  %   (c) Klaus Schnitzlein - 21.04.2025
+  
+  intermediates
+    T = 0.5*(TA+TB);
+    p = 0.5*(pA+pB);
+    x = 0.5*(xA+xB);
+    gradx = (xB-xA)/delta;
+    gradp = (pB-pA)/delta;
+    gradc = (cB-cA)/delta;
+    H = 0.5*(HA+HB); % arithmetic mean
+  end
+  
+  variables(ExternalAccess = observe)
+    J = {zeros(N,1),'mol/(m^2*s)'};
+  end
+
+  equations
+    F == A*J;
+    Phi == sum(F.*H);
+  end
+end

@@ -1,0 +1,145 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.*;
+% import ChemReactorDesign.Basic.Liquid.Functions.*;
+import ChemReactorDesign.Basic.Interface.*;
+
+component Sorption
+  % Sorption : 1.5 : fixed
+  % Mass Transfer Rate for Sorption at an Interface
+  %
+  %   (c) Klaus Schnitzlein - 27.05.2025
+  
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % A
+  end
+  
+  nodes
+    Port_B_L = Liquid; % 
+    Port_B_I = Interface; % 
+  end
+  
+  annotations
+    Icon = './Sorption.svg';
+    Port_B_L : Side = left;
+    Port_B_I : Side = right;
+    Ain : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput,select),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Thermodynamics',dHads),...
+      UIGroup('Stoichiometry',nu_L,nu_I),...
+      UIGroup('Kinetics',kads,K0,g)];
+  end
+
+  parameters(Access = private)
+    N_L = Port_B_L.N;
+    N_I = Port_B_I.N;
+    M = size(nu_L,2);
+  end
+  
+  parameters
+    areaInput = OnOff.Off;          % Area Input
+    select = SorptionMode.Langmuir; % Sorption Mechanism
+    nu_L = {[-1;0],'1'};            % Stoichiometric Cofficients Liquid
+    nu_I = {[1;0],'1'};             % Stoichiometric Cofficients Interface
+    dHads  = {0,'kJ/mol'};          % Sorption Enthalpy
+    kads = {0,'mol/(m^2*s)'};       % Sorption Rate Constant
+    K0 = {1,'1'};                   % Equilibrium Constant at Standard Conditions
+ end
+  
+  parameters(ExternalAccess=none)
+    A0     = {0,'cm^2'};          % Area
+    g      = {0,'1'};             % Frumkin/Tempkin Parameter
+  end
+  
+  parameters(Access = private)
+    snu_L = (1*(nu_L ~= 0))'*nu_L;
+    snu_I = (1*(nu_I ~= 0))'*nu_I;
+  end
+
+  equations
+    assert(size(nu_L,1) == N_L && size(nu_L,2) == M,...
+    'invalid number of stoichiometric coefficients for liquid phase');
+    assert(size(nu_I,1) == N_I && size(nu_I,2) == M,...
+    'invalid number of stoichiometric coefficients for interface phase');
+    assert(sum(sum(1*(nu_L < 0),1)) == M,...
+      'invalid stoichiometric coefficients for liquid phase');
+    assert(sum(sum(1*(nu_I > 0),1)) == M,...
+      'invalid stoichiometric coefficents for interface phase');
+  end
+
+  if(areaInput == OnOff.On)
+    intermediates
+      A  = Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    intermediates
+      A = A0;
+    end
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access=private)
+    F_L = {zeros(N_L,1),'mol/s'};
+    F_I = {zeros(N_I,1),'mol/s'};
+    Phi_L = {0,'W'};
+  end
+
+  branches
+    F_L : * -> Port_B_L.F
+    F_I: * -> Port_B_I.F
+    Phi_L : * -> Port_B_L.Phi;
+  end
+  
+  intermediates
+    R = Port_B_L.R;
+    T = Port_B_L.T;
+    Theta = Port_B_I.Theta;
+    x = checkMoleFractions(Port_B_L.x);
+    c = getConc(x,getProperty_T(Port_B_L.table_T,Port_B_L.table_Vm,T));
+
+    sc =  (1*(nu_L ~= 0))'*value(c,'mol/l');
+    sTheta = (1*(nu_I ~= 0))'*Theta;
+    Theta0 = max_noZC(1-sum(Theta),eps);
+    n = sum(snu_I,1)';
+    K = reshape(K0,M,1).*exp(-dHads/R*(1/T-1/{298.15,'K'})); % dHads != konstant
+  end
+
+ if(select == SorptionMode.Langmuir)
+    intermediates
+     r = reshape(kads,M,1).*(sc.*Theta0.^n-sTheta.^n./K);
+    end
+  elseif(select == SorptionMode.Frumkin)
+    annotations
+      g : ExternalAccess=modify;
+    end
+    intermediates
+       r = reshape(kads,M,1).*(sc.*Theta0.^n-sTheta.^n./(K*exp(g*sum(Theta))));
+    end
+  elseif(select == SorptionMode.Tempkin)
+    annotations
+      g : ExternalAccess=modify;
+    end
+    intermediates
+      r = reshape(kads,M,1).*(sc-sTheta.^n./(K*exp(g*sum(Theta))));
+    end
+  elseif(select == SorptionMode.Linear)
+    intermediates
+      r = reshape(kads,M,1).*(sc-sTheta./K);
+    end
+  end
+
+  equations
+    F_L == A*nu_L*r;
+    F_I == A*nu_I*r;
+    Phi_L == 0;
+  end
+
+end

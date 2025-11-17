@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="100"
+      viewBox="0 0 200 100"
+      >
+  <g  d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="100"
+	  fill="none" stroke="black" stroke-width="5" />
+    <circle cx="25" cy="30" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <circle cx="25" cy="50" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <circle cx="25" cy="70" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <circle cx="45" cy="40" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <circle cx="45" cy="60" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <circle cx="65" cy="50" r="5"
+	    fill="none" stroke-width="2" stroke="black" />   
+    <polyline points="80,35 150,35"
+	      fill="none" stroke-width="2" stroke="black" />   
+   <polyline points="150,35 150,25 170,35 150,45 150,35" 
+	      fill="black" stroke-width="2" stroke="black" />
+    <polyline points="80,65 150,65"
+	      fill="none" stroke-width="2" stroke="black" />   
+   <polyline points="150,65 150,55 170,65 150,75 150,65" 
+	      fill="black" stroke-width="2" stroke="black" />
+   </g>
+</svg>

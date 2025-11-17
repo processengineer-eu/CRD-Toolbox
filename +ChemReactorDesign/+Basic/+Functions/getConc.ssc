@@ -1,0 +1,10 @@
+function c = getConc(x,Vm)
+%% Berechnung der Konzentrationen als Funktion der Molenbrüche
+%
+%   (c) Klaus Schnitzlein - 27.12.2022
+%
+
+definitions
+  c = x/(Vm(end)+sum(x(1:end-1).*(Vm(1:end-1)-Vm(end)))+{eps,'l/mol'})
+end
+end

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="250"
+      height="250"
+      viewBox="0 0 250 250"
+      >
+   <g d:options="Port:L0">
+    <rect x="50" y="80" width="150" height="90"
+	  style="fill:white;stroke:white;stroke-width:1" />
+    <path d="M50,80 v90 h150" stroke-width="2" stroke="black" fill="none" />
+    <polyline points="100,125 150,125" stroke="black" />
+    <polyline points="135,115 135,135 150,125" stroke-width="2" fill="black" />
+    <circle cx="85" cy="125" r="15" stroke="black" stroke-width="2" fill="none" />
+    <polyline points="0,125 50,125" stroke="black" stroke-width="2"/>
+  </g>
+  <g d:options="Port:R0">
+    <path d="M200,170 v-90 h-150" stroke-width="2" stroke="black" fill="none" />
+    <path d="M200,125 h50" stroke-width="2" stroke="black" fill="none"/>
+    <path d="M150,110 L150,140 L180,140 L180,110 z" stroke-width="2" stroke="black" fill="none" />
+  </g>
+</svg>

@@ -1,0 +1,79 @@
+import ChemReactorDesign.Basic.enum.*;
+
+component Conduction
+  % Conductive Heat Transport : 1.5
+  %
+  %   (c) Klaus Schnitzlein - 29.01.2025
+  
+  inputs(ExternalAccess = none)
+    lambdaIn = {1.0e-04,'W/(m*K)'};
+    Ain = {0,'m^2'}; % A
+  end
+
+  nodes
+    Port_C = foundation.thermal.thermal; %
+    Port_D = foundation.thermal.thermal; %
+  end
+
+  annotations
+    Icon = './Conduction.svg';
+    Port_C : Side = left;
+    Port_D : Side = right;
+    [lambdaIn,Ain] : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput,lambdaInput),...
+      UIGroup('Geometry',A0,delta),...
+      UIGroup('Heat Transport',lambda0)];
+  end
+
+  parameters
+    areaInput = OnOff.Off;           % Area Input
+    lambdaInput = OnOff.Off;         % Lambda Input
+    A0 = {1,'m^2'};                  % Cross Sectional Area
+    delta  = {1.0e-03,'m'};          % Transport Distance
+    lambda0 = {1.0e-04,'W/(m*K)'};    % Heat Conductivity
+  end
+
+  if(areaInput ==OnOff.On)
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  end
+
+  if(lambdaInput == OnOff.On)
+    annotations
+      lambdaIn : ExternalAccess = modify;
+      lambda0 : ExternalAccess = none;
+    end
+  end
+
+  variables
+    Q = {0,'W'};
+  end
+
+  branches
+    Q : Port_C.Q -> Port_D.Q;
+  end
+
+  intermediates
+    gradT = (Port_D.T-Port_C.T)/delta;
+    A = if(areaInput == OnOff.On),
+      Ain
+    else
+      A0
+    end;
+    lambda = if(lambdaInput == OnOff.On)
+      lambdaIn
+    else
+      lambda0
+    end;
+  end
+  
+  equations
+    Q == -A*lambda*gradT;
+    assert(A > 0);
+    assert(delta > 0);
+  end
+
+end

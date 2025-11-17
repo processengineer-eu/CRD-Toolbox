@@ -1,0 +1,26 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component Bosanquet < DiffusionK(...
+    D = 1./(1./reshape(Dm,N,1)+1./reshape(Dk,N,1)));
+  % Bosanquet : 1.5
+  % Diffusive Mass Transport after Bosanquet
+  %
+  %   (c) Klaus Schnitzlein - 20.06.2025
+
+  annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',Dm,Dk)];
+  end
+
+  parameters
+    Dm = {1.0e-06*ones(2,1),'m^2/s'};  % Mixture Diffusion Coefficients
+  end
+
+  equations
+    assert(length(Dm) == N);
+  end
+
+end

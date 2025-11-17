@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On;"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="200"
+      viewBox="0 0 200 200" 
+      >
+  <g  d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="200"
+	  style="fill:none;stroke:black;stroke-width:2" />
+   <polyline points="30,40 30,170 170,170 170,40 30,40"
+	      fill="none" stroke-width="2" stroke="black" />
+    <circle cx="110" cy="105" r="40" stroke="black" stroke-width="1" fill="none" />
+    <circle cx="90" cy="105" r="40" stroke="black" stroke-width="1" fill="none" />
+  </g>
+  
+</svg>

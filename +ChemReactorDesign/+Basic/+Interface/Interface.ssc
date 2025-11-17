@@ -1,0 +1,29 @@
+domain Interface
+  % Interface Domain
+  % Definition of an Ideal Mixture of Adsorbed Species on an Interface 
+  %
+  %   (c) Klaus Schnitzlein - 05.05.2024
+
+  parameters
+    N   = {2,'1'};                 % Number of Species
+    Ids = {[1;2],'1'};             % Species Identifier
+    Mw = {[0;0],'g/mol'};          % Molar Weight
+    Am  = {[0;0],'m^2/mol'};       % Specific Surface Areas
+    R   = {8.3143,'J/(mol*K)'};    % Universal Gas Constant
+    Far = {9.6485e+04,'A*s/mol'};  % Faraday Constant
+    F_nom = {1.0e-06,'mol/s'};     % Nominal Value for Molar Flow Rates
+  end
+  
+  variables
+    Theta = {value={zeros(N,1),'1'},imin={0,'1'},imax={1,'1'}}; % Fractional Coverages
+  end
+  
+  variables(Balancing = true)
+    F = {zeros(N,1),'mol/s'}; % Molar flow rates
+  end
+  
+  equations
+    assert(N >= 1);
+  end
+
+end

@@ -1,0 +1,36 @@
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+
+component DiffusionF < BaseDiffusion
+  % Fickian Diffusion : 1.5
+  % Diffusive Mass Transport according to Fick 
+  % and Heat Transport by Thermal Convection and Conduction
+  %
+  % (c) Klaus Schnitzlein - 30.07.2025
+
+ annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",areaInput,referenceVelocity),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',D)];
+  end
+
+  parameters
+    D = {1.0e-06*ones(1,1),'m^2/s'}; % Generalized Fickian Diffusion Coefficients
+  end
+
+  equations
+      assert((size(D,1) == N-1 && size(D,2) == N-1),...
+      'invalid size -> size(D) ~= [N-1,N-1]');
+  end
+
+  equations
+    J(1:N-1) == -ctot*sum(D.*repmat(gradx(1:N-1),1,N-1),2);
+    J(N) == if(referenceVelocity == ReferenceVelocity.molarAverage),
+      -sum(J(1:N-1))
+    else
+      0
+    end;
+  end
+end

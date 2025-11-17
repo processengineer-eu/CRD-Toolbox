@@ -1,0 +1,17 @@
+function mum = getMixtureMu(Mw,x,mu)
+  %
+  % Viscosity of gas mixture at low pressures 
+  %
+  % (c) Klaus Schnitzlein - 16.01.2025
+  
+  definitions
+    N = length(x);
+    % mum = sum(x.*sqrt(Mw).*mu)./(sum(x.*sqrt(Mw)));
+    
+    %% Wilke Equation
+    Phi = (1+sqrt(mu*(1./mu')).*(Mw*(1./Mw')).^-0.25).^2./sqrt((8*(1+Mw*(1./Mw'))));
+    % mum = sum(x.*mu./(Phi*x));
+    mum = ones(1,N)*(x.*mu./(Phi*x)); % nach Empfehlung MathWorks Support
+  end
+end
+

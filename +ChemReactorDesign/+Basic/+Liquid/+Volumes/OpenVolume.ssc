@@ -1,0 +1,28 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.Volumes.*;
+
+component OpenVolume < BaseVolume
+  % OpenVolume : 1.5 : fixed
+  % Open Liquid Volume 
+  %
+  %   (c) Klaus Schnitzlein - 29.07.20255
+
+  annotations
+    pin : Side = top;
+    Icon = './OpenVolume.svg';
+    UILayout = [...
+      UIGroup('Options',pressureInput,volumeOutput,isothermalOperation),...
+      UIGroup('Geometry',V0,A0,h0),...
+      UIGroup('OperatingConditions',x0,p0,T0),...
+      UIGroup('Nominal Values',n_nom)];
+  end
+  
+  equations
+    if(isothermalOperation == OnOff.On)
+      T.der == 0;
+    else
+      sum(F.*H)+sum(max_n.*cp)*T.der == Phi+Q;
+    end
+    pI == if(pressureInput == OnOff.On), pin else p0 end;
+  end
+end

@@ -1,0 +1,120 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Solid.enum.*;
+import ChemReactorDesign.Basic.Solid.*;
+
+component (Hidden=true) BaseVolume
+  % BaseVolume : 1.0 : fixed
+  % Base Class for Volumes
+  %
+  %   (c) Klaus Schnitzlein - 10.09.2025
+
+  inputs(ExternalAccess = none)
+    pin = {1,'bar'}; % p
+  end
+
+  outputs(ExternalAccess = none) 
+    mout = {zeros(length(selectSpecies),1),'g'}; % m
+    Vout = {0,'l'}; % V
+  end
+
+  nodes
+    Port_A = Solid;  %
+    Port_C = foundation.thermal.thermal;  %
+  end
+
+  annotations
+    Port_A : Side = left;
+    Port_C : Side = bottom;
+    [mout,Vout] : Side = top;
+    H : LoggingUnit = 'kJ/mol';
+  end
+
+  parameters
+    isothermalOperation = OnOff.On;  % Isothermal Operation
+    pressureInput = OnOff.Off;       % Pressure Input
+    volumeOutput = OnOff.Off;        % Volume Output
+    massOutput = OnOff.Off;          % Mass Output
+    m0 = {[0;0],'g'};                % Initial Masses
+    A0 = {10,'cm^2'};                % Sectional Area
+    h0 = {0,'m'};                    % Geodetic Height
+    p0 = {1.0,'bar'};                % Initial Pressure
+    T0 = {298.15,'K'};               % Initial Temperature
+    n_nom = {1,'mol'};               % Number of Moles
+  end
+
+  parameters(ExternalAccess = none)
+    selectSpecies = {[1],'1'};
+  end
+
+   parameters(Access = protected) 
+     N = Port_A.N;
+     n0 = reshape(m0,N,1)./Port_A.Mw;
+   end
+   
+  if(isothermalOperation == OnOff.On)
+    annotations
+      Port_C : ExternalAccess = none;
+    end
+  end  
+
+  if(pressureInput == OnOff.On)
+    annotations
+      pin : ExternalAccess = modify;
+      p0 : ExternalAccess = none;
+    end
+  end
+
+  if(volumeOutput == OnOff.On)
+    annotations
+      Vout : ExternalAccess = modify;
+    end
+  end
+
+  if(massOutput == OnOff.On)
+    annotations
+      [selectSpecies,mout] : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access = protected)
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_A.F_nom};
+    Phi = {value={0,'W'},nominal=Port_A.Phi_nom};
+    Q = {value={0,'W'},nominal=Port_A.Q_nom};
+    n = {value=n0,imin={0,'mol'},nominal=n_nom,priority=priority.high};
+    pI = {value=p0};
+    T = {value=T0,priority=priority.high};
+    V = {value=sum(n0.*getProperty_T(Port_A.table_T,Port_A.table_Vm,T0)),priority=priority.high};
+  end
+
+  branches
+    F : Port_A.F -> *; 
+    Phi : Port_A.Phi -> *;
+    Q : Port_C.Q -> *;
+  end
+
+  intermediates
+    R = Port_A.R;
+    g = Port_A.g;
+    Mw = Port_A.Mw;
+    cp = getProperty_T(Port_A.table_T,Port_A.table_cp,T);
+    Vm = getProperty_T(Port_A.table_T,Port_A.table_Vm,T);
+    H = Port_A.H;
+    max_n = max_noZC(n,0); 
+    x = n(1:N-1,1)/(sum(n)+{eps,'mol'});
+  end
+  
+  equations
+    n.der == F;
+    V.der == sum(Vm.*F);
+
+    Port_A.x == x;
+    Port_A.p == pI + if(lt(V,{eps,'l'})), 0 else sum(n.*Mw/V)*(V/A0+h0)*g end;
+    Port_A.T == T;
+    Port_C.T == T;
+    Vout == V;	
+    mout == max_n(selectSpecies).*Port_A.Mw(selectSpecies);
+  end
+
+end
+

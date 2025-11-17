@@ -1,0 +1,74 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.Solid.Functions.*;
+import ChemReactorDesign.Basic.Solid.Transport.*;
+
+component (Hidden = true) BaseConvection < BaseTransport
+  % Base Class for Convective Mass and Heat Transport
+  %   - with Upstream Conditions
+  %
+  %   (c) Klaus Schnitzlein - 25.06.2025
+
+  inputs(ExternalAccess = none)
+    yin = {0,'1'}; % z
+  end
+  
+  outputs(ExternalAccess = none)
+    qout = {1,'l/s'}; % q
+  end
+  
+  annotations
+    [qout,yin] : Side = top;
+    q : LoggingUnit = 'l/s';
+  end
+  
+  parameters
+    controlInput = OnOff.Off; % Control Input
+    flowOutput = OnOff.Off;   % Flow Output
+    checkValve = OnOff.Off;   % Check Valve
+  end
+
+  parameters(ExternalAccess = none)
+    ymin = {1.0e-04,'1'}; % Minimum Control Signal
+  end
+  
+  if(flowOutput == OnOff.On)
+    annotations
+      qout : ExternalAccess = modify;
+    end
+  end
+
+  if(controlInput == OnOff.On)
+    annotations
+      yin : ExternalAccess = modify;
+    end
+  end
+
+  intermediates
+    rhoA = sum(cA.*Port_A.Mw);
+    rhoB = sum(cB.*Port_A.Mw);
+    deltap = if(checkValve == OnOff.On),
+      if(ge(pA,pB)), pA-pB else 0 end;
+    else
+      pA-pB;
+    end;
+    y = if(controlInput == OnOff.On),
+      max_noZC(ymin,min_noZC(yin,1)); % die Schranke sollte nicht kleiner sein als AbsTol
+    else
+      1;
+    end;
+  end
+
+  variables 
+    q = {0,'l/s'};
+  end
+
+  equations
+    F == if(ge(q,0)), y*q*cA else y*q*cB end;
+    Phi == if(ge(q,0)), sum(F.*HA) else sum(F.*HB) end;
+    % F == q*regStep(q,cA,cB,{1.0e-10,'l/s'});
+    % Phi == sum(F.*regStep(q,HA,HB,{1.0e-10,'l/s'}));
+    qout == q;
+  end
+end

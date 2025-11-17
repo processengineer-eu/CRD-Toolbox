@@ -1,0 +1,40 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.Volumes.*;
+
+component Overhead < BaseVolume
+  % Overhead : 1.5 : fixed
+  % OpenVolume with Gas Overhead 
+  %   with equal temperature for Gas and Liquid
+  %
+  %   (c) Klaus Schnitzlein - 11.08.2025
+
+  annotations
+    pin : Side = top;
+    Icon = './Overhead.svg';
+    pressureInput : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',volumeOutput,isothermalOperation),...
+      UIGroup('Geometry',V0,Vmax,A0,h0),...
+      UIGroup('Gas',cpGas),...
+      UIGroup('OperatingConditions',x0,p0,T0),...
+      UIGroup('Nominal Values',n_nom)];
+  end
+  
+  parameters
+    Vmax = {1,'l'};  % Maximum Volume
+    cpGas = {1.0e-03,'kJ/(mol*K)'}; % Specific Heat Gasphase
+  end
+
+  parameters(Access = private)
+    nGas = p0*(Vmax-V0)/(Port_A.R*T0); % # Moles Gas
+  end
+
+  equations
+    if(isothermalOperation == OnOff.On)
+      T.der == 0;
+    else
+      sum(F.*H)+(nGas*cpGas+sum(max_n.*cp))*T.der == Phi+Q+(Vmax-V)*pI.der;
+    end
+     pI == p0*(Vmax-V0)/(Vmax-V);
+  end
+end

@@ -1,0 +1,37 @@
+import ChemReactorDesign.Basic.Interface.*; 
+
+component Properties
+  % Properties Interface : 1.5 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 28.07.2025
+   
+  nodes
+    Port_B = Interface(...
+      N = N,...
+      Ids = Ids,...
+      Mw = reshape(Mw,N,1),...
+      Am = reshape(Am,N,1),...
+      F_nom = F_nom); %
+  end
+    
+  annotations
+    Icon = './Properties.svg';
+    Port_B : Side = right;
+    UILayout = [UIGroup('Species',N,Ids),...
+      UIGroup("Data",Mw,Am),...
+      UIGroup('Numerics',F_nom)];
+  end
+
+  parameters
+    N  = {2,'1'};               % Number of Species
+    Ids = {[1,2],'1'};          % Species Identifier
+    Mw = {[0;0],'g/mol'};       % Molar Weights
+    Am = {[0;0],'m^2/mol'};     % Specific Surface Areas
+    F_nom = {1.0e-10,'mol/s'};  % Nominal Value for Molar Flow Rates
+  end
+
+  equations
+    assert(length(Am) == N);
+  end
+  
+end

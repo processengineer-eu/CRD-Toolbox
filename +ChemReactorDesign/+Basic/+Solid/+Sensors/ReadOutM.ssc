@@ -1,0 +1,74 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.Solid.Functions.*;
+
+component ReadOutM
+  % ReadOut : 1.0 : fixed
+  % Read Out Thermodynamic Mixture Properties 
+  %
+  %   (c) Klaus Schnitzlein - 24.09.2025
+  
+  nodes
+    Port_A = Solid;   % 
+  end
+
+  outputs(ExternalAccess = none)
+    out_cp = {0,'J/(mol*K)'};  % cp
+    out_rho = {0,'g/l'}; % rho
+    out_lambda = {0,'W/(m*K)'}; % la
+  end
+
+  annotations
+    Icon = './ReadOut.svg'; % vorerst
+    Port_A : Side = left;
+    out_cp : Side = right;
+    out_rho : Side = right;
+    out_lambda : Side = right;
+    UILayout = [UIGroup('Outputs',outputCp,outputRho,outputLambda)];
+  end
+  
+  parameters(Access = private)
+    N = Port_A.N;
+  end
+
+  parameters
+    outputCp =OnOff.Off; % Output cp
+    outputRho = OnOff.Off; % Output rho
+    outputLambda = OnOff.Off; % Output lambda
+  end
+
+  intermediates
+    T = Port_A.T;
+    Mw = Port_A.Mw;
+    x = checkMoleFractions(Port_A.x);
+    Vm = getProperty_T(Port_A.table_T,Port_A.table_Vm,T); 
+    cp = getProperty_T(Port_A.table_T,Port_A.table_cp,T);
+    lambda = getProperty_T(Port_A.table_T,Port_A.table_lambda,T)
+  end
+
+  if(outputCp == OnOff.On)
+    annotations
+      out_cp : ExternalAccess = modify;
+    end
+  end
+
+  if(outputRho == OnOff.On)
+    annotations
+      out_rho : ExternalAccess = modify;
+    end
+  end
+  
+  if(outputLambda == OnOff.On)
+   annotations
+     out_lambda : ExternalAccess = modify;
+    end
+ end
+
+  equations
+    out_cp == sum(x.*cp);
+    out_rho == sum(x.*Mw./Vm);
+    out_lambda == getMixtureLambda(x,lambda);
+  end
+
+end

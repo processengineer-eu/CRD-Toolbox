@@ -1,0 +1,147 @@
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+
+component VLE
+  % VLE : 1.5 : fixed
+  % Vapor-Liquid Equilibrium VLE
+  %
+  %   (c) Klaus Schnitzlein - 27.08.2025
+
+  nodes
+    Port_B_G = Gas;     %
+    Port_B_L = Liquid;  %
+  end
+
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % S
+  end
+
+  inputs 
+    Vin = {0,'l'}; % V
+  end
+
+  annotations
+    Icon = './Partition.svg';
+    Port_B_G : Side = right;
+    Port_B_L : Side = left;
+    [Ain,Vin] : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0,VinMin),...
+      UIGroup('Stoichiometry',nu_G,nu_L),...
+      UIGroup('Kinetics',k)];
+    [r] : LoggingUnit = 'mol/(m^2*s)';
+    [Vin] : LoggingUnit = 'l';
+  end
+  
+  parameters(Access = private)
+    N_L = Port_B_L.N;
+    N_G = Port_B_G.N;
+    M = size(nu_L,2);
+  end
+  
+  parameters
+    areaInput = OnOff.Off;           % AreaInput
+    nu_L = {[-1;0],'1'};             % Stoichiometric Coefficients (Liquid)
+    nu_G = {[1;0],'1'};              % Stoichiometric Coefficients (Gas)
+    k = {0,'mol/(m^2*s)'};           % Rate Constants
+    VinMin = {1.0e-10,'l'};          % Minimum Liquid Volume
+  end
+
+  parameters(ExternalAccess = none)
+    A0 = {1,'m^2'};      % Exchange Area
+    max_p = {10,'bar'};  % Maximum Pressure
+    psmall = {10,'Pa'};  % Pressure Hysteresis (nicht zu klein wählen)
+  end
+  
+  parameters(Access = private)
+    Ids = Port_B_L.Ids;
+  end
+
+  equations
+    assert(size(nu_L,1) == N_L && size(nu_L,2) == M,...
+    'invalid number of stoichiometric coefficients for liquid phase');
+    assert(size(nu_G,1) == N_G && size(nu_G,2) == M,...
+    'invalid number of stoichiometric coefficients for gas phase');
+    assert(sum(sum(1*(nu_L == -1),1)) == M,...
+      'invalid stoichiometric coefficients for liquid phase');
+    assert(sum(sum(1*(nu_G == 1),1)) == M,...
+      'invalid stoichiometric coefficents for gas phase');
+    assert(length(k) == M,...
+      'invalid size of rate constants');
+  end
+
+  if(areaInput == OnOff.On)
+    equations
+      A  == Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+    equations
+      A == A0;
+    end
+  end
+
+  variables(Access=private)
+    F_G = {zeros(N_G,1),'mol/s'};
+    Phi_G = {0,'W'};
+    F_L = {zeros(N_L,1),'mol/s'};
+    Phi_L = {0,'W'};
+    A  = {0,'m^2'};
+  end
+
+  branches
+    F_G : * -> Port_B_G.F
+    Phi_G : * -> Port_B_G.Phi;
+    F_L : * -> Port_B_L.F;
+    Phi_L : * -> Port_B_L.Phi;
+  end
+  
+  intermediates
+    p = Port_B_G.p;
+    R = Port_B_G.R;
+    T = Port_B_L.T; 
+ 
+    sel_G = (1*(nu_G == 1))';
+    y = sel_G*checkMoleFractions(Port_B_G.x);
+    max_y = max_noZC(y,eps);
+    phi = sel_G*Port_B_G.phi;
+
+    sel_L = (1*(nu_L == -1))';
+    x = sel_L*checkMoleFractions(Port_B_L.x);
+    max_x = max_noZC(x,eps);
+
+    lambda_L = regStep(Vin-VinMin,1,0,VinMin);
+    
+    pvap = sel_L*getProperty_T(Port_B_L.table_T,Port_B_L.table_pvap,Port_B_L.T);
+    gamma = sel_L*Port_B_L.gamma;
+    pbubble = lambda_L*sum(max_x.*gamma.*pvap); % neu
+    pdew = 1/sum(phi.*max_y./(gamma.*pvap));
+    K = gamma.*pvap./(phi.*p);
+        
+    tcond = regStep(pdew-p-psmall,0,1,psmall);
+    tvap = regStep(pbubble-p+psmall,1,0,psmall);
+    rvap = max_x;
+    rcond = max_y./K;
+    r = (tvap+tcond)*k.*(rvap-rcond);
+
+    H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,Port_B_G.T);
+    H_L = getProperty_T(Port_B_L.table_T,Port_B_L.table_H,Port_B_L.T);
+    Hv = -(sel_G*H_G-sel_L*H_L);
+  end
+  
+  equations
+    F_G == nu_G*r*A;
+    F_L == nu_L*r*A;
+    Phi_G == sum(F_G.*H_G); 
+    Phi_L == sum(F_L.*H_L) + A*sum(r.*Hv); 
+  end
+end

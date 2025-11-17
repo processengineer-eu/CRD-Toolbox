@@ -1,0 +1,20 @@
+component RateP < ChemReactorDesign.Basic.Liquid.Rates.BaseRate
+  % RateP : 1.5
+  % Power Law Reaction Rate 
+  %
+  %  (c) Klaus Schnitzlein - 19.02.2025
+
+  annotations
+    Icon = './Rate.svg';
+    UILayout = [...
+      UIGroup('Options',rateReference,reversibility,calculate_Ka),...
+      UIGroup('Stoichiometry',nu),...
+      UIGroup('Thermodynamics',Ka0),...
+      UIGroup('Kinetics',kfinfV,kfinfA,kfinfm,Ea,kappaf)];
+  end
+
+  equations
+    r == kf*(lambdaf*prodf-lambdab*prodb/Ka);
+  end
+    
+end

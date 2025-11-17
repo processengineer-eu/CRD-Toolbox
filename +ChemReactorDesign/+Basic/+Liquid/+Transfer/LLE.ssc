@@ -1,0 +1,92 @@
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Transfer.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.Functions.*;
+
+component (Propagation = blocks) LLE
+  % LLE: 1.5 
+  % Mass Transfer by Partition 
+  %
+  %   (c) Klaus Schnitzlein - 30.07.2025
+
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % A
+  end
+
+  nodes
+    Port_B1 = Liquid;   % 
+    Port_B2 = Liquid;   % 
+  end
+ 
+  annotations
+    Icon = './Partition.svg';
+    Port_B1 : Side = left;
+    Port_B2 : Side = right;
+    Ain : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Stoichiometry',nu1,nu2),...
+      UIGroup('Thermodynamics',Kpart),...
+      UIGroup('Kinetics',k)];
+  end
+
+  parameters
+    areaInput = OnOff.Off;   % Area Input
+    nu1 = {[-1;0],'1'};      % Stoichiometric Cofficients Liquid I
+    nu2 = {[1;0],'1'};       % Stoichiometric Cofficients Liquid II
+    Kpart = {1,'1'};         % Partition Coefficient
+    k = {1,'mol/(cm^2*s)'};  % Rate Constant
+    A0 = {0,'m^2'};          % Exchange Area
+  end
+
+  parameters(Access = private)
+    N1 = Port_B1.N;
+    N2 = Port_B1.N;   
+    M = size(nu1,2);
+  end
+ 
+  if(areaInput == OnOff.On)
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  end
+
+  components(ExternalAccess = observe)
+    Coupler1 = Coupler(...
+      formulated = RateFormulatedInTermsOf.MoleFractions,...
+      areaInput = areaInput,...
+      M = M,...
+      A0 = A0,...
+      nu = nu1);
+    Coupler2 = Coupler(...
+      formulated = RateFormulatedInTermsOf.MoleFractions,...
+      areaInput = areaInput,...
+      M = M,...
+      A0 = A0,...
+      nu = nu2);
+  end
+  
+  intermediates
+    r = reshape(k,M,1).*(Coupler1.x_out-Coupler2.x_out./reshape(Kpart,M,1));
+  end
+
+  equations
+    Coupler1.r == r;
+    Coupler2.r == r;
+ 
+    assert(size(nu1,1) == N1 && size(nu1,2) == M,...
+      'invalid size for stöchionmetric coefficients nu1');
+    assert(size(nu2,1) == N2 && size(nu2,2) == M,...
+      'invalid size for stöchionmetric coefficients nu2');
+  end
+  
+  connections
+    connect(Port_B1,Coupler1.Port_B);
+    connect(Port_B2,Coupler2.Port_B);
+    connect(Ain,Coupler1.Ain,Coupler2.Ain);
+  end
+end

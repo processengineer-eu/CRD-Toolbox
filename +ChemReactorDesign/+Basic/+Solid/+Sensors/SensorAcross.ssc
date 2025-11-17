@@ -1,0 +1,81 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.Solid.enum.*;
+
+component SensorAcross
+  % Sensor Across : 1.0 : fixed
+  %
+  %   (c) Klaus chnitzlein - 27.05.2025
+
+  outputs(ExternalAccess = none)
+    rhoout = {zeros(length(selectSpecies),1),'g/l'};  % r
+    cout = {zeros(length(selectSpecies),1),'mol/l'};  % c
+    xout = {zeros(length(selectSpecies),1),'1'};      % x 
+    Tout = {298.15,'K'}; % T
+    pout = {1,'bar'}; % p
+  end
+
+  nodes
+    Port_A = Solid; % 
+  end
+    
+  parameters(ExternalAccess = none)
+    selectSpecies = {[1],'1'};
+  end
+  
+  parameters
+    output = OutputSelect.None; % Select Output
+    temperatureOutput = OnOff.Off;     % Temperature Output
+    pressureOutput = OnOff.Off; % Pressure Output
+  end
+
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    [rhoout,cout,xout,Tout,pout] : Side = bottom;
+    UILayout = [...
+      UIGroup('Options',output,temperatureOutput,selectSpecies)];
+  end
+
+  if(output == OutputSelect.Concentrations)
+    annotations
+      [selectSpecies,cout] : ExternalAccess = modify;
+    end
+  elseif(output == OutputSelect.MoleFractions)
+    annotations
+      [selectSpecies,xout] : ExternalAccess = modify;
+    end
+   elseif(output == OutputSelect.Densities)
+    annotations
+      [selectSpecies,rhoout] : ExternalAccess = modify;
+    end 
+  end
+
+  if(temperatureOutput == OnOff.On)
+    annotations
+      Tout : ExternalAccess = modify;
+    end
+  end
+
+   if(pressureOutput == OnOff.On)
+    annotations
+      pout : ExternalAccess = modify;
+    end
+  end
+
+  intermediates
+    x = checkMoleFractions(Port_A.x);
+    c = getConc(x,getProperty_T(Port_A.table_T,Port_A.table_Vm,Port_A.T));
+  end
+
+  equations
+    xout == x(selectSpecies);
+    cout == c(selectSpecies);
+    rhoout == cout.*Port_A.Mw(selectSpecies);
+    Tout == Port_A.T;
+    pout == Port_A.p;
+  end
+
+end
+

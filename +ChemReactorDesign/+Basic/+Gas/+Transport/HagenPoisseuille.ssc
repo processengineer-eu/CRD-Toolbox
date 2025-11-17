@@ -1,0 +1,40 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component HagenPoisseuille < ConvectionP(...
+    areaInput = OnOff.Off,...
+    controlInput = OnOff.Off,...
+    checkValve = OnOff.Off,...
+    beta0 = 144*mu*delta/(pi*dt^4),...
+    beta1 = {0,'bar*s^2/m^6'});
+  
+  % Hagen Poisseuille : 1.5
+  % Convection Mass Transport in a Cylindrical Tube for Laminar Flow
+  %
+  %   (c) Klaus Schnitzlein - 08.07.2025
+   
+  annotations
+    Icon = './HagenPoisseuille.svg';
+    [A0,b0,b1,areaInput,checkValve,controlInput] : ExternalAccess = none;
+    delta : ExternalAccess = modify;
+    UILayout = [...
+      UIGroup('Options',flowOutput),...
+      UIGroup('Geometry',dt,delta)];
+    mu : LoggingUnit = 'Pa*s';
+  end
+  
+  parameters
+    dt = {1,'cm'}; % Tube Diameter
+  end
+  
+  intermediates
+    mu = if(ge(deltap,0)),
+      getMixtureMu(Port_A.Mw,xA,muA)
+    else
+      getMixtureMu(Port_A.Mw,xB,muB)
+    end;
+  end
+
+end
+ 

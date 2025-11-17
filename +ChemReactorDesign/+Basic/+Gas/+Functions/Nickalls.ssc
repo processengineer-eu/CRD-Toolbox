@@ -1,0 +1,17 @@
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+function r = Nickalls(c,table_zdd)
+  % Interpolation Solution of Cubic Equation after (Nickalls:1997)
+  % (c) Klaus Schnitzlein - 26.09.2025
+
+  definitions
+    xn = -c(2)/(3*c(1));
+    yn = c(1)*xn^3+c(2)*xn^2+c(3)*xn+c(4)
+    delta = sqrt((c(2)^2-3*c(1)*c(3))/(9*c(1)^2));
+    h = 2*c(1)*delta^3;
+    zdd = [tablelookup(table_zdd(:,1),table_zdd(:,2),yn/h,interpolation = linear, extrapolation = error),...
+           tablelookup(table_zdd(:,1),table_zdd(:,3),yn/h,interpolation = linear, extrapolation = error),...
+           tablelookup(table_zdd(:,1),table_zdd(:,4),yn/h,interpolation = linear, extrapolation = error)];
+    r = max(xn+delta*zdd);
+  end
+end

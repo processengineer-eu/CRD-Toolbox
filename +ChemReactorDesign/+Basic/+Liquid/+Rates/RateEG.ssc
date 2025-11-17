@@ -1,0 +1,100 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Rates.*;
+
+component RateEG < BaseRate(reversibility = Reversibility.Reversible,...
+                            rateReference = RateReference.Area)
+  % RateEG : 1.5
+  % Heterogeneous (Liquid-Gas) Electrochemical Reaction Rate
+  %
+  %   (c) Klaus Schnitzlein - 10.10.2025
+  
+  nodes
+    Port_B_G = Gas;  %
+    Port_p = foundation.electrical.electrical; % +
+    Port_n = foundation.electrical.electrical; % -
+  end
+
+  annotations
+    Icon = './RateE.svg';
+    [Port_p,Port_n] : Side = bottom;
+    Port_B_G: Side = right;
+    [calculate_Ka,Ka0,rateReference,reversibility,kappaf] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',calculate_U0),...
+      UIGroup('Thermodynamics',U0),...
+      UIGroup('Kinetics',kfinfA,Ea,alpha),...
+      UIGroup('Liquid',nu),...
+      UIGroup('Gas',nu_G)];
+  end
+
+  parameters
+    nu_G = {[-1;0],'1'};  % Stoichiometric Coefficients Gas
+    calculate_U0 = OnOff.Off;  % Calculate U0
+    alpha = {0.5,'1'};        % Factor of Symmetry
+  end
+  
+  parameters(ExternalAccess = none)
+    U0 = {0,'V'};              % Equilibrium Potential
+  end
+
+  parameters(Access = private)
+    N_G = Port_B_G.N;
+    row_nu_G = reshape(nu_G,N_G,1);
+    z = Port_B.charge;
+    n = abs(sum(row_nu.*z));
+    [row_kappaf_G,row_kappab_G] = getKappa(row_nu_G);
+  end
+  
+  if(calculate_U0 == OnOff.On)
+    intermediates
+      H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,T);
+      S_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_S,T);
+      t_U0 = (-dGr-sum(row_nu_G.*(H_G-T*S_G)))/(n*Port_B.Far);
+    end
+  else
+    annotations
+      U0 : ExternalAccess = modify;
+    end
+    intermediates
+      t_U0 = U0;
+    end
+  end
+    
+  variables(Access=protected)
+    i = {0,'A'};
+    F_G = {zeros(N_G,1),'mol/s'};
+    Phi_G = {0,'W'}
+  end
+
+  branches
+    i : Port_p.i -> Port_n.i;
+    F_G : * -> Port_B_G.F;
+    Phi_G : * -> Port_B_G.Phi;
+  end
+
+  intermediates
+    Far = Port_B.Far;
+    U = Port_p.v - Port_n.v;
+    f = Far/(Port_B.R*T);
+    eta = U - t_U0;
+    kf1 = A*kfinfA*exp(-Ea/(R*T));
+    x_G = checkMoleFractions(Port_B_G.x);
+    a_G = max_noZC(Port_B_G.phi.*x_G*Port_B_G.p/{1,'bar'},eps); 
+    prodf_G = prod(a_G.^row_kappaf_G);
+    prodb_G = prod(a_G.^row_kappab_G);
+  end
+  
+  equations
+    r == kf1*(exp(-alpha*n*f*eta)*prodf_G*prodf-...
+              exp((1-alpha)*n*f*eta)*prodb_G*prodb);
+    i == -Port_B.Far*sum(z.*F);
+    F_G == row_nu_G*r;
+    Phi_G == 0;
+
+    assert(length(nu_G) == N_G);
+  end
+end

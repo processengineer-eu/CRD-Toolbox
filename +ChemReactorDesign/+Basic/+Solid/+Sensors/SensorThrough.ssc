@@ -1,0 +1,87 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.Solid.enum.*;
+
+component SensorThrough
+  % Sensor Through : 1.0 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 25.04.2025
+  
+  nodes
+    Port_A = Solid; % 
+    Port_B = Solid; % 
+  end
+  
+  outputs(ExternalAccess = none);
+    Fout = {zeros(length(selectSpecies),1),'mol/s'}; % F
+    Phiout = {0,'W'}; % Q
+    qout = {0,'l/s'}; % q
+  end
+  
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+    [Fout,Phiout,qout] : Side = bottom;
+    UILayout = [...
+      UIGroup('Options',energyOutput,fluxOutput,flowOutput,selectSpecies)];
+  end
+
+  parameters(ExternalAccess = none)
+    selectSpecies = {[1],'1'};
+  end
+  
+  parameters
+    fluxOutput = OnOff.Off; % Fluxes Output
+    energyOutput = OnOff.Off; % Heat Output
+    flowOutput = OnOff.Off; % Flow Output
+  end
+  
+  if(energyOutput == OnOff.On)
+    annotations
+      Phiout : ExternalAccess = modify;
+    end
+  end
+
+  if(fluxOutput == OnOff.On)
+    annotations
+      [selectSpecies,Fout] : ExternalAccess = modify;
+    end
+  end
+  
+  if(flowOutput == OnOff.On)
+    annotations
+      [qout] : ExternalAccess = modify;
+    end
+  end
+
+  parameters(Access = private)
+    N = Port_A.N;
+  end
+
+  variables(Access=private)
+    F = {zeros(N,1),'mol/s' };
+    Phi = {0,'W' };
+  end
+  
+  branches
+    F : Port_A.F -> Port_B.F;
+    Phi : Port_A.Phi -> Port_B.Phi;
+  end
+  
+  intermediates
+    x = checkMoleFractions(Port_A.x);
+    c = getConc(x,getProperty_T(Port_A.table_T,Port_A.table_Vm,Port_A.T));
+    q0 = sum(F)/sum(c);
+  end
+
+  equations
+    Port_A.x == Port_B.x;
+    Port_A.T == Port_B.T;
+    Port_A.p == Port_B.p;
+    Fout == F(selectSpecies);
+    Phiout == Phi;
+    qout == q0;
+  end
+end

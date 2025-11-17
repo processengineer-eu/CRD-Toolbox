@@ -1,0 +1,52 @@
+import ChemReactorDesign.Basic.Interface.*;
+import ChemReactorDesign.Basic.Interface.enum.*;
+
+component SensorAcross
+  % Sensor Across : 1.0 : fixed
+  % Sensor for surface concentrations or fractional coverages
+  %
+  %   Copyright Klaus Schnitzlein - 13.02.2025
+
+  nodes
+    Port_A = Interface; % 
+  end
+
+  outputs(ExternalAccess = none)
+    gammaout = {zeros(length(selectSpecies),1),'mol/m^2'};  % g
+    Thetaout = {zeros(length(selectSpecies),1),'1'};        % t
+  end
+
+  parameters
+    output = OutputSelect.gamma;
+    selectSpecies = {[1,2],'1'};
+  end
+
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    [gammaout,Thetaout] : Side = top;
+    UILayout = [...
+      UIGroup('Options',output,selectSpecies)];
+  end
+
+  if(output == OutputSelect.gamma)
+    annotations
+      gammaout : ExternalAccess = modify;
+    end
+  elseif(output == OutputSelect.Theta)
+    annotations
+      Thetaout : ExternalAccess = modify;
+    end
+  end
+  
+  intermediates
+    gamma = Port_A.Theta./Port_A.Am;
+  end
+
+  equations
+    gammaout == gamma(selectSpecies);
+    Thetaout == Port_A.Theta(selectSpecies)
+  end
+
+end
+

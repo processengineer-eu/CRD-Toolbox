@@ -1,0 +1,122 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+% import ChemReactorDesign.Basic.Liquid.Functions.*;
+
+component Coupler
+  % Coupler: 1.0 
+  % Coupler for Connecting two Transfer Blocks for Multiple Rates
+  %
+  %   (c) Klaus Schnitzlein - 30.09.2025
+
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % A
+  end
+  
+  inputs
+    r = {zeros(M,1),'mol/(cm^2*s)'}; % r
+  end
+
+  outputs(ExternalAccess = none)
+    c_out = {zeros(M,1),'mol/l'}; % c
+    x_out = {zeros(M,1),'1'}; % x
+  end
+
+  nodes
+    Port_B = Liquid;  % 
+  end
+  
+  annotations
+    Icon = './Coupler.svg';
+    Port_B : Side = left;
+    Ain : Side = top;
+    [r,c_out,x_out] : Side = right;
+    UILayout = [...
+      UIGroup('Options',areaInput,formulated),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Stoichiometry',M,nu)];
+  end
+  
+  parameters(Access = private)
+    N = Port_B.N;
+  end
+
+  parameters
+    formulated = RateFormulatedInTermsOf.Concentrations; % Rate Formulation in Terms of
+    areaInput = OnOff.Off;   % Area Input
+    M = {2,'1'};             % Number of Transfer Rates
+    nu = {[1,0;0,1],'1'};    % Stoichiometric Cofficients
+    A0 = {0,'m^2'};          % Exchange Area
+  end
+
+  parameters(Access = private)
+    row_nu = reshape(nu,N,M);
+    snu = (1*(row_nu ~= 0))'*row_nu;
+  end
+
+  if(formulated == RateFormulatedInTermsOf.Concentrations)
+    annotations
+      c_out : ExternalAccess = modify;
+    end
+  else
+    annotations
+      x_out : ExternalAccess = modify;
+    end
+  end
+
+  if(areaInput == OnOff.On)
+    intermediates
+      A  = Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    intermediates
+      A = A0;
+    end
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+  end
+  
+  variables(Access=private)
+    F = {zeros(N,1),'mol/s'};
+    Phi = {0,'W'};
+  end
+
+  branches
+    F : * -> Port_B.F
+    Phi : * -> Port_B.Phi;
+ end
+  
+  intermediates
+    T = Port_B.T;
+    gamma = Port_B.gamma;
+    sgamma = (1*(nu ~= 0))'*gamma;
+    x = checkMoleFractions(Port_B.x);
+    sx = (1*(nu ~= 0))'*x;
+    c = getConc(x,getProperty_T(Port_B.table_T,Port_B.table_Vm,T)); 
+    sc = (1*(nu ~= 0))'*value(c,'mol/l');
+  end
+
+  equations
+    F == A*row_nu*r;
+    Phi == 0;
+
+    x_out == sgamma.*max_noZC(sx,eps);
+    c_out == {sgamma.*max_noZC(sc,eps),'mol/l'};
+  
+    assert(size(nu,1) == N && size(nu,2) == M,...
+      'invalid size for stöchionmetric coefficients');
+
+    assert(sum(sum(1*(nu ~= 0),1)) == M,...
+      'invalid values for stoichiometric coefficients');
+ end
+end
+
+    
+    
+  

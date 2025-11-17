@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="100"
+      viewBox="0 0 200 100"
+      >
+  <g  d:options="Port:L0">
+    <path d="M110,0 h-110 v100 h70 z"
+	  style="fill:none;stroke:black;stroke-width: 2;"
+	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;" />
+    <path d="M130,0 h70 v+100 h-110 z"
+	  style="fill:none;stroke:black;stroke-width: 2;"
+	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;" />
+  </g>
+</svg>

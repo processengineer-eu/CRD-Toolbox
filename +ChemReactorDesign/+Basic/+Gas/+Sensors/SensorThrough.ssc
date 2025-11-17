@@ -1,0 +1,93 @@
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.enum.*;
+
+component SensorThrough
+  % Through Sensor : 1.0 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 11.06.2025
+  
+  nodes
+    Port_A = Gas; % 
+    Port_B = Gas; % 
+  end
+  
+  outputs(ExternalAccess = none);
+    Fout = {zeros(length(selectSpecies),1),'mol/s'}; % F
+    Phiout = {0,'W'}; % Phi
+    qout = {0,'l/s'}; % q
+  end
+  
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+    [Fout,Phiout,qout] : Side = top;
+    UILayout = [...
+      UIGroup('Options',energyOutput,fluxOutput,flowOutput,selectSpecies)];
+  end
+
+  parameters(ExternalAccess = none)
+    selectSpecies = {[1,2],'1'};
+  end
+  
+  parameters
+    fluxOutput = OnOff.Off; % Fluxes Output
+    energyOutput = OnOff.Off; % Energy Output
+    flowOutput = FlowOut.Off; % Flow Output
+  end
+  
+  if(energyOutput == OnOff.On)
+    annotations
+      Phiout : ExternalAccess = modify;
+    end
+  end
+
+  if(fluxOutput == OnOff.On)
+    annotations
+      [selectSpecies,Fout] : ExternalAccess = modify;
+    end
+  end
+  
+  if(flowOutput ~= FlowOut.Off)
+    annotations
+      [qout] : ExternalAccess = modify;
+    end
+  end
+      
+  parameters(Access = private)
+    N = Port_A.N;
+  end
+
+  variables(Access=private)
+    F = {zeros(N,1),'mol/s' };
+    Phi = {0,'W'};
+  end
+  
+  branches
+    F : Port_A.F -> Port_B.F;
+    Phi : Port_A.Phi -> Port_B.Phi;
+  end
+  
+  if(flowOutput == FlowOut.Standard)
+    intermediates
+      c0 = {1,'bar'}/(Port_A.R*{298.15,'K'}); % at STP Conditions
+    end
+  else
+    intermediates
+      c0 = Port_A.p/(Port_A.R*Port_A.T);
+    end
+  end
+
+  intermediates
+    q0 = sum(F)/c0;
+  end
+
+  equations
+    Port_A.p == Port_B.p;
+    Port_A.T == Port_B.T;
+    Port_A.x == Port_B.x;
+    Fout == F(selectSpecies);
+    Phiout == Phi;
+    qout == q0;
+  end
+end

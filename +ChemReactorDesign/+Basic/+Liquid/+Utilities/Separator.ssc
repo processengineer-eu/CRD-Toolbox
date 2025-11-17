@@ -1,0 +1,47 @@
+import ChemReactorDesign.Basic.Liquid.*;
+
+component Separator 
+  % Separator: 1.0
+  %
+  %   (c) Klaus Schnitzlein - 15.01.2025
+ 
+  outputs(ExternalAccess = none)
+    xout = {zeros(N-1,1),'1'};
+    pout = {0,'bar'};
+    Tout = {0,'K'};
+  end
+
+  nodes
+    Port_A = Liquid; % 
+    Port_B = Liquid; % 
+  end
+  
+  annotations
+    Icon = './Separator.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+  end
+
+  parameters(Access = protected)
+    N = Port_A.N;
+  end
+  
+  variables(Access = protected)
+    F = {zeros(N,1),'mol/s'};
+    Phi = {0,'W'};
+  end
+
+  branches
+    F : Port_A.F -> Port_B.F;
+    Phi : Port_A.Phi -> Port_B.Phi;
+  end
+
+  equations
+    F == {zeros(N,1),'mol/s'};
+    Phi == {0,'W'};
+    xout == Port_A.x-Port_B.x;
+    pout == Port_A.p-Port_B.p;
+    Tout == Port_A.T-Port_B.T;
+  end
+
+end

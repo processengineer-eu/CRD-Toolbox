@@ -1,0 +1,56 @@
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+
+component Migration < BaseDiffusion
+  % Migration : 1.5 
+  % Mass Transport by Diffusion/Migration
+  %
+  % (c) Klaus Schnitzlein - 13.06.2025
+ 
+  nodes
+    Port_p = foundation.electrical.electrical; % +
+    Port_n = foundation.electrical.electrical; % -
+  end
+
+  annotations
+    Icon = './Diffusion.svg';
+    Port_p : Side = bottom;
+    Port_n : Side = bottom;
+    [referenceVelocity,areaInput] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Transport',D,delta,A0)];
+  end
+                
+  parameters % (A(i) in Solvent A(N))
+    D = {[1.0e-10],'m^2/s'};  % Diffusion Coefficients 
+  end
+
+  parameters(Access = private)
+    row_D = reshape(D,N-1,1);
+  end
+
+  equations
+    assert(length(D) == N-1);
+    assert(length(z) == N);
+  end
+
+  variables(Access=private)
+    i = {0, 'A' };   
+  end
+
+  branches
+    i : Port_p.i -> Port_n.i;
+  end
+  
+  intermediates
+    z = Port_A.charge;
+    Far = Port_A.Far;
+    gradPhi = (Port_n.v-Port_p.v)/delta;
+    Jd = -row_D(1:N-1).*gradc(1:N-1);
+    Jm = -c(1:N-1).*z(1:N-1).*row_D(1:N-1)*Port_A.Far/(Port_A.R*T)*gradPhi;
+  end
+
+  equations
+    J == [Jd+Jm;0];
+    i == -Far*sum(z.*F);
+  end
+end

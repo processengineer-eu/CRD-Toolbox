@@ -1,0 +1,89 @@
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+
+component SensorAcross
+  % Across Sensor : 1.0 : fixed
+  %
+  %   (c) Klaus Schnitzlein - 19.01.2025
+
+  outputs(ExternalAccess = none)
+    pout = {1,'bar'};    % p
+    cout = {zeros(length(selectSpecies),1),'mol/l'};  % c
+    xout = {zeros(length(selectSpecies),1),'1'};  % x
+    Tout = {298.15,'K'}; % T
+  end
+
+  nodes
+    Port_A = Liquid; % 
+  end
+    
+  parameters(ExternalAccess = none)
+    selectSpecies = {[1,2],'1'};
+  end
+  
+  parameters
+    concentrationsOutput = OnOff.Off;  % Concentrations Output
+    temperatureOutput = OnOff.Off;     % Temperature Output
+    pressureOutput = OnOff.Off;        % Pressure Output
+  end
+
+  parameters(ExternalAccess = none)
+    fractionsOutput = OnOff.Off;       % FractionsOutput
+  end
+
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    [pout,cout,xout,Tout] : Side = right;
+    UILayout = [...
+      UIGroup('Options',concentrationsOutput,temperatureOutput,...
+      pressureOutput,fractionsOutput,selectSpecies)];
+  end
+
+  if(concentrationsOutput == OnOff.On)
+    annotations
+      [selectSpecies,fractionsOutput] : ExternalAccess = modify;
+    end
+    if(fractionsOutput == OnOff.On)
+      annotations
+        xout : ExternalAccess = modify;
+      end
+    else
+      annotations
+        cout : ExternalAccess = modify;
+      end
+    end
+  end
+
+  if(pressureOutput == OnOff.On)
+    annotations
+      pout : ExternalAccess = modify;
+    end
+  end
+
+  if(temperatureOutput == OnOff.On)
+    annotations
+      Tout : ExternalAccess = modify;
+    end
+  end
+
+  intermediates
+    xA = checkMoleFractions(Port_A.x);
+    Vm = getProperty_T(Port_A.table_T,Port_A.table_Vm,Port_A.T);
+    cA = getConc(xA,Vm);
+  end
+
+  equations
+    assert(sum(1*(selectSpecies > Port_A.N)) == 0,'Invalid species index');
+  end
+
+  equations
+    cout == cA(selectSpecies);
+    xout == xA(selectSpecies);
+    pout == Port_A.p;
+    Tout == Port_A.T;
+ end
+
+end
+

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"
+>
+<svg width="1.625in" height="1.5in" viewBox="0 0 117 108"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+<title>Fig file converted by fig2lat</title>
+<desc>http://dktools.sourceforge.net/fig2lat.html</desc>
+<defs>
+<style type="text/css"><![CDATA[
+.sB {
+fill: none;
+stroke: #000000;
+stroke-width: 0.9;
+stroke-miterlimit: 20;
+}
+.sA {
+fill: none;
+stroke: #000000;
+stroke-width: 0.9;
+stroke-miterlimit: 20;
+}
+]]></style>
+</defs>
+<polyline
+points="73.8,34.2
+68.4,31.5
+63,28.8
+57.6,28.8
+46.8,34.2
+44.1,50.4
+46.8,66.6
+57.6,72
+63,72
+73.8,66.6"
+class="sA"
+/>
+<rect
+x="9" y="1.8" width="99.9" height="97.2"
+class="sB"
+/>
+</svg>

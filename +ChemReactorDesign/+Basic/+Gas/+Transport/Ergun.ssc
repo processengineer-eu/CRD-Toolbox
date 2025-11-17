@@ -1,0 +1,67 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component Ergun < ConvectionP(...
+    controlInput = OnOff.Off,...
+    checkValve = OnOff.Off,...
+    beta0 = 150*mu*(1-por)^2/(por^3*dp^2)*delta/A,...
+    beta1 = 1.75*rho*(1-por)/(por^3*dp)*delta/A^2)
+  % Ergun : 1.5
+  % Convective Mass and Heat Transport in a Porous Medium
+  %
+  %   (c) Klaus Schnitzlein - 08.07.2025
+   
+  inputs(ExternalAccess = none)
+    epsbIn = {1,'1'}; % e
+  end
+  
+  annotations
+    Icon = './Ergun.svg';
+    epsbIn : Side = top;
+    [b0,b1,controlInput,checkValve] : ExternalAccess = none;
+    delta : ExternalAccess = modify;
+    UILayout = [...
+      UIGroup('Options',porosityInput,areaInput,flowOutput),...
+      UIGroup('Geometry',A0,delta),...
+      UIGroup('MassTransport',epsb,dp)];
+  end
+  
+  parameters
+    porosityInput = OnOff.Off; % Porosity Input
+    epsb = {1,'1'};  % Voidage Fraction
+    dp = {1.0e-06,'m'};  % Particle Diameter
+  end
+  
+  if(porosityInput == OnOff.On)
+    annotations
+      epsbIn : ExternalAccess = modify;
+      epsb : ExternalAccess = none;
+    end
+  end
+
+  intermediates
+    por = if(porosityInput == OnOff.On), 
+      max_noZC(epsbIn,eps); 
+    else 
+      epsb 
+    end;
+    mu = if(ge(deltap,0)),
+      getMixtureMu(Port_A.Mw,xA,muA)
+    else
+      getMixtureMu(Port_A.Mw,xB,muB)
+    end;
+    rho = if(ge(deltap,0)),
+      sum(xA.*Port_A.Mw)*pA/(R*TA)
+    else
+      sum(xB.*Port_A.Mw)*pB/(R*TB)
+    end;
+  end
+
+  equations
+    assert(por<=1 && por>0,'void fraction must be 0 < eps <=1');
+  end
+
+end
+ 

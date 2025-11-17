@@ -1,0 +1,16 @@
+ function val = getProperty_T(table_T,table_val,T)
+   % Retrieving the temperature dependent thermodynamic property 
+   % by linear interpolation
+   %
+   %   (c) Klaus Schnitzlein - 15.01.2025
+
+   definitions
+     assert(ge(T,table_T(1)),'<ERROR> getProperty_T: T < Tmin',...
+       Action = simscape.enum.assert.action.warn);
+     assert(le(T,table_T(end)),'<ERROR> getProperty_T: T > Tmax',...
+       Action = simscape.enum.assert.action.warn);
+    N = size(table_val,2);
+    val = tablelookup(table_T,1:N,table_val,ones(1,N)*T,1:N,...
+      interpolation = linear,extrapolation = nearest)';
+  end
+ end

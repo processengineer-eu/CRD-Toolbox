@@ -1,0 +1,18 @@
+function lambdam = getMixtureLambda(x,lambda,Vm)
+  %
+  % Heat Conductivity of liquid mixtures
+  % after [Gmehling_2019,Eq.(3.147) und (3.148) p.123
+  %
+  % (c) Klaus Schnitzlein - 27.03.2025
+  
+  definitions
+    N = length(x);
+    
+    assert(size(lambda,1) == N); % Spaltenvektor
+    assert(size(Vm,1) == N);     % Spaltenvektor
+
+    Phi = x.*Vm/sum(x.*Vm);
+    lambdam = sum(sum(2*(Phi*Phi')./(repmat(1./lambda,1,N)+repmat((1./lambda)',N,1))));
+ end
+end
+

@@ -1,0 +1,82 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.Functions.*;
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+
+component (Hidden = true) BaseConvection < BaseTransport
+  % Base Class for Convective Mass
+  %   - with Upstream Conditions
+  %
+  %   (c) Klaus Schnitzlein - 05.08.2025
+
+  inputs(ExternalAccess = none)
+    yin = {0,'1'}; % y
+  end
+  
+  outputs(ExternalAccess = none)
+    qout = {1,'l/s'}; % q
+  end
+  
+  annotations
+    [qout,yin] : Side = top;
+    q : LoggingUnit = 'l/s';
+  end
+  
+  parameters
+    controlInput = OnOff.Off; % Control Input
+    flowOutput = OnOff.Off;   % Flow Output
+    checkValve = OnOff.Off;   % Check Valve
+  end
+
+  parameters(ExternalAccess = none)
+    ymin = {1.0e-10,'1'}; % Minimum Control Signal
+  end
+  
+  if(flowOutput == OnOff.On)
+    annotations
+      qout : ExternalAccess = modify;
+    end
+  end
+
+  if(controlInput == OnOff.On)
+    annotations
+      yin : ExternalAccess = modify;
+    end
+  end
+
+  intermediates
+    muA = getProperty_T(Port_A.table_T,Port_A.table_mu,TA);
+    muB = getProperty_T(Port_A.table_T,Port_A.table_mu,TB);
+    rhoA = sum(cA.*Port_A.Mw);
+    rhoB = sum(cB.*Port_A.Mw);
+    deltap = if(checkValve == OnOff.On),
+      if(ge(pA,pB)), pA-pB else 0 end;
+    else
+      pA-pB;
+    end;
+    y = if(controlInput == OnOff.On),
+      max_noZC(ymin,min_noZC(yin,1)); % die Schranke sollte nicht kleiner sein als AbsTol
+    else
+      1;
+    end;
+  end
+
+  variables 
+    q = {0,'l/s'};
+  end
+
+  equations
+    F == if(ge(q,0)), 
+      q*cA 
+    else 
+      q*cB 
+    end;
+    Phi == if(ge(q,0)), 
+      sum(F.*HA) 
+    else 
+      sum(F.*HB) 
+    end;
+    qout == q;
+  end
+end

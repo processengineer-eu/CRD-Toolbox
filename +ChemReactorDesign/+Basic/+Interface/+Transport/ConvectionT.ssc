@@ -1,0 +1,39 @@
+import ChemReactorDesign.Basic.Interface.Transport.*;
+
+component ConvectionT < BaseTransport
+  % ConvectionT : 1.5
+  % Convective Mass Transport Induced by an External Shear Stress
+  %
+  %   (c) Klaus Schnitzlein - 28.07.2025
+  
+  inputs
+    u0 = {0,'m/s'}; % u0
+  end
+
+  annotations
+    Icon = './ConvectionT.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+    u0 : Side = top;
+    [delta] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',wInputOutput),...
+      UIGroup('MassTransport',alpha)];
+  end
+  
+  parameters
+    alpha = {1,'1'};      % Factor
+  end
+
+  intermediates
+    gamma = Port_A.Theta./Port_A.Am;
+    Theta = Port_B.Theta;
+    u = u0*exp(-alpha*sum(Theta));
+  end
+
+  equations
+    assert(u0 >= 0);
+    F == w*u*gamma;
+  end
+  
+end

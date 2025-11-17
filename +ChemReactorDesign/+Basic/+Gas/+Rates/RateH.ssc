@@ -1,0 +1,50 @@
+component RateH < ChemReactorDesign.Basic.Gas.Rates.BaseRate
+  % RateH : 1.5
+  % Hyperbolic Reaction Rate 
+  %
+  % Copyright Klaus Schnitzlein - 06.06.2025
+
+  annotations
+    Icon = './Rate.svg';
+    UILayout = [...
+      UIGroup('Options',rateReference,reversibility,reparametrisation,calculate_Ka),...
+      UIGroup('Stoichiometry',nu),...
+      UIGroup('Thermodynamics',Ka0,Tref),...
+      UIGroup('Kinetics',kfinfV,kfinfA,kfinfm,Ea,kappaf,beta0,betainf,Es,kappak,n)];
+  end
+
+  parameters(Access = protected)
+    L = length(betainf);
+  end
+
+  parameters
+    beta0    = {1,'1'};          % Constant Term
+    betainf  = {0,'1'};          % Multipliers
+    Es       = {0,'kJ/mol'};     % Activation Energies (Multipliers)
+    kappak   = {[0; 0],'1'};     % Exponents (Denominator)
+    n        = {1,'1'};          % Denominator Exponent
+  end
+
+  equations
+    assert(length(betainf) == length(Es));
+    assert(size(kappak,1) == N,...
+      '#Rows of Exponents must be equal to N');
+    assert(size(kappak,2) == length(betainf),...
+      '#Cols of Exponents must be equal to the length of Multipliers');
+  end
+
+  parameters(Access = private)
+    row_betainf = reshape(betainf,L,1);
+    row_Es = reshape(Es,L,1);
+  end
+
+  intermediates
+    beta = row_betainf.*exp(-row_Es/(R*T));
+    sumk = sum(beta.*prod(repmat(a,1,L).^(kappak))');
+  end
+
+  equations
+    r == kf*(lambdaf*prodf-lambdab*prodb/Ka)/(beta0+sumk)^n;
+  end
+  
+end

@@ -1,0 +1,73 @@
+import ChemReactorDesign.Basic.enum.*; 
+import ChemReactorDesign.Basic.Interface.*; 
+
+component Surface
+  % Surface : 1.5 : fixed
+  % Interface Area with constant size
+  %
+  % (c) Klaus Schnitzlein - 28.07.2025
+  
+  nodes
+    Port_A = Interface; % 
+  end
+  
+  outputs(ExternalAccess = none)
+    Aout = {0,'cm^2'};   % A
+  end
+  
+  annotations
+    Icon = './Surface.svg';
+    Port_A : Side = left;
+    Aout : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaOutput),...
+      UIGroup('Geometry',A0),...
+      UIGroup('OperatingConditions',Theta0)];
+    n : LoggingUnit = 'mol';
+  end
+  
+  parameters
+    areaOutput = OnOff.Off;  % Area Output
+    Theta0 = {[0;0],'1'};    % Initial Fractional Coverages
+    A0 = {1,'cm^2'};         % Surface Area
+  end
+ 
+  equations
+    assert(length(Theta0) == N);
+    assert(sum(Theta0) <= 1,'invalid initial fractional coverages');
+  end
+     
+  parameters(Access = private)
+    N = Port_A.N;
+  end
+
+  if(areaOutput == OnOff.On)
+    annotations
+      Aout : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access = private)
+    n = {value=reshape(Theta0,N,1)*A0./Port_A.Am,imin={0,'mol'},nominal=A0/Port_A.Am(1),priority=priority.high};
+    F = {zeros(N,1),'mol/s'};
+  end
+
+  branches
+    F : Port_A.F -> *;
+  end
+
+  intermediates
+    Theta = if(gt(A0,0)),
+      n.*Port_A.Am/A0;
+    else
+      {zeros(N,1),'1'};
+    end;
+  end
+
+  equations
+    n.der == F; 
+    Port_A.Theta == Theta;
+    Aout == A0;
+  end
+
+end

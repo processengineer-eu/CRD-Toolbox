@@ -1,0 +1,99 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Gas.enum.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+import ChemReactorDesign.Basic.Gas.Volumes.*;
+
+component PorousVolume < BaseVolume
+ % Porous Volume : 1.5 : fixed
+ % Closed Heterogeneous Gas Volume
+ %
+ %   (c) Klaus Schnitzlein - 05.08.2025
+ % 
+
+ inputs(ExternalAccess = none)
+   Vin = {0,'l'}; % V
+ end
+
+ outputs(ExternalAccess = none)
+   mout = {0,'g'};      % m
+ end
+
+ annotations
+   Vin : Side = top;
+   mout : Side = top;
+   Icon = './PorousVolume.svg';
+   UILayout = [...
+     UIGroup('Options',volumeInputOutput,massOutput,isothermalOperation,compressionWork),...
+     UIGroup('Geometry',V0),...
+     UIGroup('Solid',epsb,cps,rhos),...
+     UIGroup('OperatingConditions',x0,p0,T0)];
+   n : LoggingUnit = 'mol';
+ end
+
+ parameters
+   volumeInputOutput = InOut.Off; % Volume Input/Output
+   massOutput = OnOff.Off;        % Mass Output
+   epsb = {1,'1'};                % Void Fraction
+   cps = {1,'kJ/(kg*K)'};         % Solid Specific Heat
+   rhos = {1.0e+03,'kg/m^3'};     % Solid Density
+ end
+
+ parameters(Access = protected)
+    n0 = epsb*p0*V0/(Port_A.R*T0);
+ end
+ 
+ if(volumeInputOutput == InOut.Output)
+    annotations
+      Vout : ExternalAccess = modify;
+    end
+  elseif(volumeInputOutput == InOut.Input) 
+    annotations
+      V0 : ExternalAccess = none;
+      Vin : ExternalAccess = modify;
+    end  
+  end
+
+  if(massOutput == OnOff.On)
+    annotations
+      mout : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access = protected)
+    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n0};
+    p = {value = p0,priority = priority.high};
+    V = {value = V0,nominal = V0};
+  end
+ 
+  equations(Initial = true)
+    n == row_x0*epsb*p0*V/(z*R*T);
+  end
+
+  equations
+    n.der == F;
+    if(isothermalOperation == OnOff.On)
+      T.der == 0
+    else
+      sum(F.*H) + sum(F)*Hres + (sum(n.*cp) + V*(1-epsb)*rhos*cps)*T.der == Phi + Q +...
+      if(compressionWork == OnOff.On)
+          epsb*V*p.der 
+        else 
+        0 
+      end
+    end
+    V == if(volumeInputOutput == InOut.Input),
+      Vin
+    else
+      V0
+    end;
+    p == z*sum(n)*R*T/(epsb*V);
+
+    Vout == V;
+    mout == (1-epsb)*V*rhos;
+    Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    Port_A.p == p;
+   
+    assert(epsb <= 1 & epsb > 0,'Invalid voidage fraction');
+  end
+
+end

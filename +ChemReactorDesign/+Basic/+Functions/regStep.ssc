@@ -1,0 +1,18 @@
+function y = regStep(x,y1,y2,x_small)
+  % Approximation of a general step, such that the characteristic
+  % is continuous and differentiable
+  %
+  %   (c) Modelica Library - 17.12.2024
+  definitions
+    y = if(gt(x,x_small)),
+      y1
+    elseif(lt(x,-x_small)),
+      y2
+    elseif(gt(x_small,0)),
+      (x/x_small)*((x/x_small)^2-3)*(y2-y1)/4 + (y1+y2)/2
+    else
+      (y1+y2)/2
+    end
+  end
+end
+

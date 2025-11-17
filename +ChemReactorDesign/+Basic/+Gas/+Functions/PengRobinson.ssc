@@ -1,0 +1,72 @@
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+function EoS_data = PengRobinson(table_zdd,x,p,T,pc,Tc,w,k)
+
+  % Peng-Robinson EoS computation and property calculations
+  % cf. [Sandler eq.9.4-10 p.423]
+  %
+  %   (c) Antonio Brandao, 2009 MatlabExchange
+  %       Klaus Schnitzlein - 04.06.2025
+
+  % Inputs: alle Größen sind dimensionslos
+  % x   = number of moles of all species (n x 1 column vector) [mol]
+  % p   = pressure [Pa]
+  % T   = temperature [K]
+  % pc  = critical pressure of all components (n x 1 column vector)[Pa]
+  % Tc  = critical temperature of all components (n x 1 column vector)[K]
+  % w   = acentric factor of all components (n x 1 column vector)
+  % k   = binary parameters (n x n symmetric matrix)
+ 
+  % Outputs: alle Größen sind dimensionslos
+  % z   = compressibility factor
+  % H   = enthalpy [J/mol]
+  % phi = fugacity coefficient
+  % V   = molar volume [m3/mol]
+
+  definitions
+    R = 8.314; % [J/(mol*K)]
+    m =  0.37464 + 1.54226*w - 0.26992*w.^2;
+    alfa = (1 + m.*(1 - (T./Tc).^0.5)).^2;
+    ai = 0.45724*(R^2)*(Tc.^2)./pc.*alfa;
+    bi = 0.07780*R*Tc./pc;
+    Q = ((ai*ai').^0.5).*(1 - k);
+    a = x'*Q*x;
+    b = x'*bi;
+   
+    c = [1;b - R*T/p;-3*b^2 - 2*R*T/p*b + a/p;b^3 + R*T/p*b^2 - a*b/p];
+    
+    % Analytical Solution
+    % r = Cardano(c);
+    
+    %% Interpolation Solution
+    r = Nickalls(c,table_zdd);
+
+    % xn = -c(2)/(3*c(1));
+    % yn = c(1)*xn^3+c(2)*xn^2+c(3)*xn+c(4)
+    % delta = sqrt((c(2)^2-3*c(1)*c(3))/(9*c(1)^2));
+    % h = 2*c(1)*delta^3;
+    % zdd = [tablelookup(table_zdd(:,1),table_zdd(:,2),yn/h,interpolation = linear, extrapolation = error),...
+    %        tablelookup(table_zdd(:,1),table_zdd(:,3),yn/h,interpolation = linear, extrapolation = error),...
+    %        tablelookup(table_zdd(:,1),table_zdd(:,4),yn/h,interpolation = linear, extrapolation = error)];
+    % r = max(xn+delta*zdd);
+
+    Vm = max(r);
+    z = p*Vm/(R*T);  
+
+    % Fugazitätskoeffizienten
+    e = 1 - sqrt(2); 
+    s = 1 + sqrt(2);
+    abar = (2*x'*Q - a*ones(1,length(x)))';
+    bbar = bi;
+    phi = exp((z - 1)*bbar/b - log((Vm - b)*z/Vm) + (a/(b*R*T))/(e - s)*log((Vm + s*b)/(Vm + e*b))*...
+      (1 + abar/a - bbar/b)); 
+
+    % Departure Enthalpie
+    dQdT = 0.45724*(R^2)*(k - 1).*(Tc*Tc')./((pc*pc').^0.5).*(1/(2*T^0.5)).*...
+      ((m./(Tc.^0.5))*(alfa.^0.5)' + (alfa.^0.5)*(m./(Tc.^0.5))');
+    dadT = x'*(Q - T*dQdT)*x;
+    H = R*T*(z - 1) - dadT/(2*(s - 1)*b)*log((Vm + s*b)/(Vm + e*b));
+    EoS_data = [z;H;phi];
+  end
+end
+

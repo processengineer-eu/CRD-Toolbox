@@ -1,0 +1,35 @@
+import ChemReactorDesign.Basic.Interface.*;
+
+component Separator 
+  % Separator: 1.0
+  %
+  %   (c) Klaus Schnitzlein - 13.02.2025
+ 
+  nodes
+    Port_A = Interface; % 
+    Port_B = Interface; % 
+  end 
+
+  annotations
+    Icon = './Separator.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+  end
+
+  parameters(Access = protected)
+    N = Port_A.N;
+  end
+
+  variables(Access = protected)
+    F = {zeros(N,1),'mol/s'};
+  end
+
+  branches
+    F : Port_A.F -> Port_B.F;
+  end
+  
+  equations
+    F == {zeros(N,1),'mol/s'};
+  end
+
+  end

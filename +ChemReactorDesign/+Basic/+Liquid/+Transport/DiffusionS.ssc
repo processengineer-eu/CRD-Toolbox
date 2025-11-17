@@ -1,0 +1,43 @@
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+
+component DiffusionS < BaseDiffusion
+  % Stefan-Maxwell Diffusion : 1.5
+  % Mass Transport by Stefan-Maxwell Diffusion 
+  % and Heat Transport by Thermal Convection
+  %
+  %   (c) Klaus Schnitzlein - 07.03.2025
+
+  annotations
+  Icon = './Diffusion.svg';
+  UILayout = [...
+    UIGroup("Options",areaInput,referenceVelocity),...
+    UIGroup("Geometry",A0,delta),...
+    UIGroup('MassTransport',Dbin)];
+  end
+
+  parameters
+    Dbin = {ones(2,2),'m^2/s'};  % Binary Stefan-Maxwell Diffusion Coefficients
+  end
+
+  equations
+    assert((size(Dbin,1) == N && size(Dbin,2) == N),...
+      'invalid size -> size(Dbin= ~= [N,N]');
+    assert(sum(double(value(Dbin(1:size(Dbin,1)+1:end),'m^2/s') ~=0)) == N,...
+      'invalid value -> Dbin(i,i) == 0');
+  end
+
+  intermediates
+    help = (x*J'-J*x')./Dbin;
+  end
+  
+  equations
+    ctot*gradx(1:N-1) == sum(help(1:N-1,:),2);
+    J(N) ==  if(referenceVelocity == ReferenceVelocity.molarAverage),
+      -sum(J(1:N-1))
+    else
+      0
+    end;
+  end
+  
+end

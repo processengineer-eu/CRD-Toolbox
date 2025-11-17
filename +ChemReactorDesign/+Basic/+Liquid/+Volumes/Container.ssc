@@ -1,0 +1,39 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.Volumes.*;
+
+component Container < BaseVolume
+  % Container : 1.5 : fixed
+  % Open Liquid Volume with Container
+  %
+  %   (c) Klaus Schnitzlein - 11.08.2025
+
+  annotations
+    pin : Side = top;
+    Icon = './Container.svg';
+    pressureInput : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',pressureInput,volumeOutput,isothermalOperation),...
+      UIGroup('Geometry',V0,A0,h0),...
+      UIGroup('OperatingConditions',x0,p0,T0),...
+      UIGroup('Solid Properties',mSolid,cpSolid),...
+      UIGroup('Nominal Values',n_nom)];
+  end
+  
+  parameters
+    mSolid = {0,'g'}; % Mass
+    cpSolid = {0,'kJ/(kg*K)'}; % Specific Heat
+  end
+
+  equations(Initial = true)
+    pI == if(pressureInput == OnOff.On), pin else p0 end;
+  end
+  
+  equations
+    if(isothermalOperation == OnOff.On)
+      T.der == 0;
+    else
+      sum(F.*H)+(mSolid*cpSolid+sum(max_n.*cp))*T.der == Phi+Q;
+    end
+    pI == if(pressureInput == OnOff.On), pin else p0 end;
+  end
+end

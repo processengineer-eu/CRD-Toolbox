@@ -1,0 +1,10 @@
+function lambdam = getMixtureLambda(x,lambda)
+  % Heat Conductivity of Solid Mixture
+  %
+  % (c) Klaus Schnitzlein - 18.04.2025
+  
+  definitions
+    lambdam = sum(x.*lambda);
+  end
+end
+

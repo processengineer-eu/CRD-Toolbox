@@ -1,0 +1,103 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Interface.*;
+import ChemReactorDesign.Basic.Interface.Functions.*;
+
+component Coupler
+  % Coupler: 1.0 
+  % Coupler for Connecting two Transfer Blocks for Multiple Rates
+  %
+  %   (c) Klaus Schnitzlein - 25.03.2025
+
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % A
+  end
+  
+  inputs
+    r = {zeros(M,1),'mol/(cm^2*s)'}; % r
+  end
+
+  outputs
+    Theta_out = {zeros(M,1),'1'}; % Theta
+    Theta0_out = {1,'1'}; % Theta0
+    n_out = {ones(M,1),'1'}; % n
+  end
+
+  nodes
+    Port_B = Interface;   % 
+  end
+  
+  annotations
+    Icon = './Coupler.svg';
+    Port_B : Side = left;
+    Ain : Side = top;
+    [r,Theta_out,Theta0_out,n_out] : Side = right;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Stoichiometry',M,nu)];
+  end
+  
+  parameters(Access = private)
+    N = Port_B.N;
+  end
+
+  parameters  
+    areaInput = OnOff.Off;   % Area Input
+    M = {2,'1'};             % Number of Transfer Rates
+    nu = {[-1 0;0 -1],'1'};  % Stoichiometric Cofficients
+    A0 = {0,'m^2'};          % Exchange Area
+  end
+
+  parameters(Access = private)
+    row_nu = reshape(nu,N,M);
+    snu = (1*(row_nu ~= 0))'*row_nu;
+  end
+
+  if(areaInput == OnOff.On)
+    intermediates
+      A  = Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    intermediates
+      A = A0;
+    end
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access=private)
+    F = {zeros(N,1),'mol/s'};
+  end
+
+  branches
+    F : * -> Port_B.F
+  end
+  
+  intermediates
+    Theta = Port_B.Theta;
+    sTheta = (1*(nu ~= 0))'*Theta;
+  end
+
+  equations
+    F == A*row_nu*r;
+
+    Theta_out == min_noZC(sTheta,1);
+    Theta0_out == max_noZC(1-sum(Theta),0);
+    n_out == sum(snu,1)';
+
+    assert(size(nu,1) == N && size(nu,2) == M,...
+      'invalid size for stöchionmetric coefficients');
+    assert(sum(sum(1*(nu ~= 0),1)) == M,...
+      'invalid values for stoichiometric coefficients');
+  end
+end
+
+    
+    
+  

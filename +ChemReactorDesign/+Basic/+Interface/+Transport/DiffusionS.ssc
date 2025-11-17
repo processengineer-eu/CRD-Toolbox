@@ -1,0 +1,50 @@
+import ChemReactorDesign.Basic.Interface.*
+
+component DiffusionS < Transport.BaseTransport
+  % DiffusionS : 1.5
+  % Diffusive Mass Transport according to Stefan-Maxwell
+  %
+  %    (c) Klaus Schnitzlein - 11.02.2025
+
+  annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",wInputOutput),...
+      UIGroup("Geometry",w0,delta),...
+      UIGroup('MassTransport',Dsbin,Ds)];
+  end
+  
+  parameters
+    Dsbin = {ones(2,2),'m^2/s'};  % Counter-Sorption Diffusivity
+    Ds    = {ones(2,1),'m^2/s'};  % Surface Diffusivity
+  end
+
+  parameters(Access = private)
+    row_Ds = reshape(Ds,N,1);
+  end
+
+  equations
+    assert(delta > 0);
+    assert((size(Dsbin,1) == N && size(Dsbin,2) == N),...
+      'invalid size -> size(Ddbin= ~= [N,N]');
+    assert(sum(1*(value(Dsbin(1:size(Dsbin,1)+1:end),'m^2/s') ~=0)) == N,...
+      'invalid value -> Ddbin(i,i) == 0');
+    assert(length(Ds) == N);
+  end
+
+  intermediates
+    ThetaA = Port_A.Theta;
+    ThetaB = Port_B.Theta;
+    Theta = 0.5*(ThetaA+ThetaB);
+    gammaA = ThetaA./Port_A.Am;
+    gammaB = ThetaB./Port_A.Am;
+    gamma = 0.5*(gammaA+gammaB);
+    gradgamma = (gammaB-gammaA)/delta;
+    help = (Theta*F'-F*Theta')./Dsbin;
+  end
+
+  equations
+    w*gradgamma == sum(help,2)-F./row_Ds;
+  end
+
+end

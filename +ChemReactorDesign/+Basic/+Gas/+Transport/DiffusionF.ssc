@@ -1,0 +1,30 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component DiffusionF < BaseDiffusion
+  % Fickian Diffusion : 1.5
+  % Diffusive Mass and Mass Transport according to Fick 
+  %
+  %   (c) Klaus Schnitzlein - 30.10.2025
+
+  annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',D)];
+  end
+
+  parameters
+    D = {1.0e-06*ones(1,1),'m^2/s'}; % Generalized Fickian Diffusion Coefficients
+  end
+
+  equations
+     assert((size(D,1) == N-1 && size(D,2) == N-1),...
+      'invalid size -> size(D) ~= [N-1,N-1]');
+  end
+
+  equations
+    J(1:N-1) == -1/(R*T)*sum(D.*repmat(gradpi(1:N-1),1,N-1));
+    J(N) == -sum(J(1:N-1));
+  end
+end

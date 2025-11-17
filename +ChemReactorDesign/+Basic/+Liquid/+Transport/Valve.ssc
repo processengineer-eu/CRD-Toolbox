@@ -1,0 +1,37 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+
+component Valve < ConvectionP(...
+    controlInput = OnOff.On,...
+    beta0 = {0,'bar*s/m^3'},...
+    beta1 = rho/((Cd*A)^2))
+  % Valve : 1.5
+  % Convective Mass Transport through a Valve
+  %
+  %   (c) Klaus Schnitzlein - 08.07.2025
+  
+  annotations
+    Icon = './Valve.svg';
+    delta : ExternalAccess = none;
+    controlInput : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',areaInput,flowOutput,checkValve),...
+      UIGroup('Geometry',A0),....
+      UIGroup('MassTransport',n)];
+  end
+
+  parameters
+    n = {1,'1'}; % number of lost velocity heights
+  end
+
+  intermediates
+    Cd = sqrt(n/2); % relative capacity coefficient
+    rho = if(deltap >= 0),
+      rhoA
+    else
+      rhoB
+    end;
+  end
+  
+end

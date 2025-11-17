@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On;"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="200"
+      viewBox="0 0 200 200" 
+      >
+  <g   d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="200"
+	  style="fill:none;stroke:black;stroke-width:2" />
+    <path d="M100,170 h-70 v-130 h70"
+          style="fill:none;stroke:black;stroke-width:1" />
+    <circle cx="70" cy="80" r="8" stroke="black" stroke-width="1" fill="none" />
+    <circle cx="130" cy="80" r="8" stroke="black" stroke-width="1" fill="none" />
+    <path d="M75,85 95,105"
+          style="fill:white;stroke:black;stroke-width:" />
+  </g>
+  <g   d:options="Port:R0" > 
+    <path d="M100,170 h70 v-130 h-70"
+          style="fill:none;stroke:black;stroke-width:1" />
+    <path d="M50,120 h100 v25 h-100 z"
+	  style="fill:lightgray;stroke:black;stroke-width:1" />
+    <circle cx="100" cy="110" r="8" stroke="black" stroke-width="1" fill="none" />
+    <path d="M105,105 125,85"
+          style="fill:white;stroke:black;stroke-width:" />
+  </g> 
+  
+</svg>

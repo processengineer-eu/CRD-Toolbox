@@ -1,0 +1,148 @@
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+% import ChemReactorDesign.Basic.Liquid.Functions.*;
+
+component (Hidden = true) BaseRate
+  % Base Class for Liquid Rates
+  %
+  %   (c) Klaus Schnitzlein - 17.11.2025
+   
+  inputs(ExternalAccess = none)
+    V = {0,'l'};    % V
+    A = {0,'cm^2'}; % A
+    m = {0,'g'};    % m
+  end
+  
+  nodes
+    Port_B = Liquid; %
+  end
+  
+  annotations
+    Port_B : Side = left;
+    [V,A,m] : Side = top;
+  end
+
+  parameters
+    rateReference = RateReference.Volume; % Rate Reference
+    reversibility = Reversibility.Irreversible; % Reversibility
+    nu = {[-1 2],'1'};      % Stoichiometric Coefficients
+    Ea = {0,'kJ/mol'};      % Activation Energy
+  end
+
+  parameters(ExternalAccess = none)
+    calculate_Ka = OnOff.Off;     % Calculate Equilibrium Constant
+    kfinfV = {0,'mol/(l*s)'};     % Rate Constant
+    kfinfA = {0,'mol/(cm^2*s)'};  % Rate Constant
+    kfinfm = {0,'mol/(g*s)'};     % Rate Constant
+    Ka0 = {1.0e+30,'1'};          % Equilibrium Constant (Standard Conditions)
+    kappaf = {[0 0],'1'};         % Orders of Reaction (Forward Reaction)
+  end
+
+  parameters(Access = protected)
+    N = Port_B.N;
+    row_nu = reshape(nu,N,1);
+  end
+
+  if(rateReference == RateReference.Volume)
+    annotations
+      [V,kfinfV] : ExternalAccess = modify;
+    end
+  elseif(rateReference == RateReference.Area)
+    annotations
+      [A,kfinfA] : ExternalAccess = modify;
+    end
+  elseif(rateReference == RateReference.Mass)
+    annotations
+      [m,kfinfm] : ExternalAccess = modify;
+    end
+  end
+
+  if(reversibility == Reversibility.Reversible)
+    annotations
+      [calculate_Ka] : ExternalAccess = modify;
+    end
+    if(calculate_Ka == simscape.enum.onoff.off)
+      annotations
+        Ka0 : ExternalAccess = modify;
+      end
+    end
+    parameters
+      [row_kappaf,row_kappab] = getKappa(row_nu);
+    end
+  else
+    annotations
+      kappaf: ExternalAccess = modify;
+    end
+    parameters
+      row_kappaf = reshape(kappaf,N,1);
+      row_kappab = {zeros(N,1),'1'};
+    end
+    equations
+      assert(length(kappaf) == N);
+    end
+  end
+
+  variables(Access=protected)
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_B.F_nom};
+    Phi = {value={0,'W'},nominal=Port_B.Phi_nom};
+    r = {0,'mol/s'};
+  end
+
+  branches
+    F : * -> Port_B.F;
+    Phi : * -> Port_B.Phi;
+  end
+
+  intermediates
+    R = Port_B.R;
+    p = Port_B.p;
+    T = Port_B.T;
+    gamma = Port_B.gamma;
+
+    kf = kfinf*exp(-Ea/(R*T));
+    x = checkMoleFractions(Port_B.x);
+    Vm = getProperty_T(Port_B.table_T,Port_B.table_Vm,T);
+    c = getConc(x,Vm);
+    a = gamma.*max_noZC(c/{1,'mol/l'},eps); 
+    
+    kfinf = if(rateReference == RateReference.Volume),
+      kfinfV*V
+    elseif(rateReference == RateReference.Area),
+      kfinfA*A
+    else
+      kfinfm*m
+    end
+    
+    H = getProperty_T(Port_B.table_T,Port_B.table_H,T);
+    G = getProperty_T(Port_B.table_T,Port_B.table_G,T);
+    dGr = sum(row_nu.*G);
+    Ka = if(reversibility == Reversibility.Reversible && ...
+        calculate_Ka == simscape.enum.onoff.on)
+      exp(-dGr/(Port_B.R*T))
+    else
+      Ka0
+    end;
+
+    prodf = prod(a.^row_kappaf);
+    lambdaf = (eq(sum(1*(eq(row_kappaf,0) & lt(row_nu,0) & le(a,eps))),0)); % neu neu
+    prodb = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      prod(a.^row_kappab)
+    end;
+    lambdab = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      (eq(sum(1*(eq(row_kappab,0) & gt(row_nu,0) & le(a,eps))),0)); % neu neu
+    end
+  end
+
+  equations
+    F == row_nu*r;
+    Phi == 0;
+    assert(length(nu) == N);
+  end
+
+end

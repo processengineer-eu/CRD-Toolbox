@@ -1,0 +1,37 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component DiffusionS < BaseDiffusion
+  % Stefan-Maxwell Diffusion : 1.5 
+  % Diffusive Mass Transport according to Stefan-Maxwell 
+  %
+  %   (c) Klaus Schnitzlein - 29.10.2025
+
+  annotations
+    Icon = './Diffusion.svg';
+    UILayout = [...
+      UIGroup("Options",areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',Dbin)];  
+  end
+
+  parameters
+    Dbin = {ones(2,2),'m^2/s'};  % Binary Stefan-Maxwell Diffusion Coefficients
+  end
+
+  equations
+    assert((size(Dbin,1) == N && size(Dbin,2) == N),...
+      'invalid size -> size(Dbin= ~= [N,N]');
+    assert(sum(double(value(Dbin(1:size(Dbin,1)+1:end),'m^2/s') ~=0)) == N,...
+      'invalid value -> Dbin(i,i) == 0');
+  end
+
+  intermediates
+    help = (x*J'-J*x')./Dbin;
+  end
+
+  equations
+    1/(R*T)*gradpi(1:N-1) == sum(help(1:N-1,:),2);
+    J(N) == -sum(J(1:N-1));
+  end
+
+end

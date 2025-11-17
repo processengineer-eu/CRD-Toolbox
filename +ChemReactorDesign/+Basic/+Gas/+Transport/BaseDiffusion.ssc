@@ -1,0 +1,28 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component (Hidden = true) BaseDiffusion < BaseTransport
+  % Base Class for Diffusive Transport Mechanisms
+  %
+  %   (c) Klaus Schnitzlein - 17.06.2025
+  
+  intermediates
+    T = 0.5*(TA+TB);
+    p = 0.5*(pA+pB);
+    x = 0.5*(xA+xB);
+    gradx = (xB-xA)/delta;
+    gradp = (pB-pA)/delta;
+    gradpi = (xB*pB-xA*pA)/delta;
+    H = 0.5*(HA+HB); 
+    Hres = 0.5*(Port_A.Hres+Port_B.Hres); 
+  end
+  
+  variables(ExternalAccess = observe)
+    J = {zeros(N,1),'mol/(m^2*s)'};
+  end
+
+  equations
+    F == A*J;
+    Phi == sum(F.*H) + sum(F)*Hres;
+  end
+
+end

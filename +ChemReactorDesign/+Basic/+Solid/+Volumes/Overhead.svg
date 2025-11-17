@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On;"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="200"
+      viewBox="0 0 200 200" 
+      >
+  <g d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="200"
+	  fill="none" stroke="black" stroke-width="1" />
+    <rect x="30" y="40" width="140" height="30"
+	  fill="WhiteSmoke" stroke="black" stroke-width="2" />
+    <polyline points="30,70 30,170 170,170 170,70"
+	      fill="none" stroke-width="2" stroke="black" />
+    <ellipse cx="70" cy="145" rx="30" ry="10"
+	     style="fill:none;stroke:black;stroke-width:1" />
+    <ellipse cx="130" cy="145" rx="30" ry="10"
+	     style="fill:none;stroke:black;stroke-width:1" />
+    <polyline points="100,145 100,85"
+	      fill="none" stroke-width="2" stroke="black" />
+
+  </g>
+ </svg>
+ 

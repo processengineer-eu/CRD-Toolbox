@@ -1,0 +1,19 @@
+function lambdam = getMixtureLambda(Mw,x,mu,lambda)
+  %
+  % Heat Conductivity of gas mixture at low pressures 
+  % after [Gmehling_2019,Eq.(3.157) und (3.158) p.127
+  % [Reid et al. Eq.(10.6-1) and (10.6.2)
+  %
+  % (c) Klaus Schnitzlein - 26.01.2024
+  
+  definitions
+    N = length(x);
+    % lambdam = sum(x.*lambda);
+  
+    %% Wassiljevailke Equation 
+    Phi = (1+sqrt(mu*(1./mu')).*(Mw*(1./Mw')).^-0.25).^2./sqrt((8*(1+Mw*(1./Mw'))));
+    % lambdam = sum(x.*lambda./(Phi*x));
+    lambdam = ones(1,N)*(x.*lambda./(Phi*x)); % nach Empfehlung MathWorks Support
+ end
+end
+

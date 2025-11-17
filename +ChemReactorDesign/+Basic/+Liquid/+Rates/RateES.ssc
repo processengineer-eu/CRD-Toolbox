@@ -1,0 +1,96 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Rates.*;
+
+component RateES < BaseRate(reversibility = Reversibility.Reversible,...
+                            rateReference = RateReference.Area)
+  % RateES : 1.5
+  % Heterogeneous (Liquid-Solid) Electrochemical Reaction Rate
+  %
+  %   (c) Klaus Schnitzlein - 10.10.2025
+  
+  nodes
+    Port_B_S = Solid;  %
+    Port_p = foundation.electrical.electrical; % +
+    Port_n = foundation.electrical.electrical; % -
+  end
+
+  annotations
+    Icon = './RateE.svg';
+    [Port_p,Port_n] : Side = bottom;
+    Port_B_S: Side = right;
+    [calculate_Ka,Ka0,rateReference,reversibility,kappaf] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',calculate_U0),...
+      UIGroup('Thermodynamics',U0),...
+      UIGroup('Kinetics',kfinfA,Ea,alpha),...
+      UIGroup('Liquid',nu),...
+      UIGroup('Solid',nu_S)];
+  end
+
+  parameters
+    nu_S = {[-1;0],'1'};  % Stoichiometric Coefficients Solid
+    calculate_U0 = OnOff.Off;  % Calculate U0
+  end
+  
+  parameters(ExternalAccess = none)
+    U0 = {0,'V'};              % Equilibrium Potential
+    alpha = {0.5,'1'};        % Factor of Symmetry
+  end
+
+  parameters(Access = private)
+    N_S = Port_B_S.N;
+    row_nu_S = reshape(nu_S,N_S,1);
+    z = Port_B.charge;
+    n = abs(sum(row_nu.*z));
+  end
+  
+  if(calculate_U0 == OnOff.On)
+    intermediates
+      t_U0 = -dGr/(n*Port_B.Far);
+    end
+  else
+    annotations
+      U0 : ExternalAccess = modify;
+    end
+    intermediates
+      t_U0 = U0;
+    end
+  end
+    
+  variables(Access=protected)
+    i = {0,'A'};
+    F_S = {zeros(N_S,1),'mol/s'};
+    Phi_S = {0,'W'}
+  end
+
+  branches
+    i : Port_p.i -> Port_n.i;
+    F_S : * -> Port_B_S.F;
+    Phi_S : * -> Port_B_S.Phi;
+  end
+
+  intermediates
+    Far = Port_B.Far;
+    U = Port_p.v - Port_n.v;
+    f = Far/(Port_B.R*T);
+    eta = U - t_U0;
+    kf1 = A*kfinfA*exp(-Ea/(R*T));
+    x_S = checkMoleFractions(Port_B_S.x); 
+    lambdaf_S = (sum(1*(lt(row_nu_S,0) & le(x_S,eps)))==0);
+    lambdab_S = (sum(1*(gt(row_nu_S,0) & le(x_S,eps)))==0); 
+  end
+  
+  equations
+    r == kf1*(exp(-alpha*n*f*eta)*lambdaf_S*prodf-...
+              exp((1-alpha)*n*f*eta)*lambdab_S*prodb);
+    i == -Port_B.Far*sum(z.*F);
+    F_S == row_nu_S*r;
+    Phi_S == 0;
+
+    assert(length(nu_S) == N_S);
+  end
+end

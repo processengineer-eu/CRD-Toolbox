@@ -1,0 +1,124 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Solid.*;
+
+component SLE
+  % SLE : 1.5 : fixed
+  % Mass Transfer Rate for Solid Liquid Equilibrium
+  %
+  %   (c) Klaus Schnitzlein - 13.10.2025
+  
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % A
+  end
+  
+  nodes
+    Port_B_L = Liquid; % 
+    Port_B_S = Solid; % 
+  end
+  
+  annotations
+    Icon = './Partition.svg';
+    Port_B_L : Side = left;
+    Port_B_S : Side = right;
+    Ain : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Stoichiometry',nu_L,nu_S),...
+      UIGroup('Thermodynamics',K0),...
+      UIGroup('Kinetics',k)];
+  end
+
+  parameters(Access = private)
+    N_L = Port_B_L.N;
+    N_S = Port_B_S.N;
+    M = size(nu_L,2);
+  end
+  
+  parameters
+    areaInput = OnOff.Off;          % Area Input
+    nu_L = {[-1;0],'1'};            % Stoichiometric Cofficients Liquid
+    nu_S = {[1;0],'1'};             % Stoichiometric Cofficients Solid
+    k = {0,'mol/(cm^2*s)'};         % Mass Transfer Rate Constant
+    K0 = {1,'1'};                   % Solubility Product at Standard Conditions
+  end
+  
+  parameters(ExternalAccess=none)
+    A0     = {0,'cm^2'};            % Area
+  end
+  
+  parameters(Access = private)
+    snu_L = (1*(nu_L ~= 0))'*nu_L;
+    snu_S = (1*(nu_S ~= 0))'*nu_S;
+  end
+
+  equations
+    assert(size(nu_L,1) == N_L && size(nu_L,2) == M,...
+    'invalid number of stoichiometric coefficients for liquid phase');
+    assert(size(nu_S,1) == N_S && size(nu_S,2) == M,...
+    'invalid number of stoichiometric coefficients for solid phase');
+    assert(sum(sum(1*(nu_L < 0),1)) == M,...
+      'invalid stoichiometric coefficients for liquid phase');
+    assert(sum(sum(1*(nu_S > 0),1)) == M,...
+      'invalid stoichiometric coefficents for solid phase');
+  end
+
+  if(areaInput == OnOff.On)
+    intermediates
+      A  = Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    intermediates
+      A = A0;
+    end
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+  end
+
+  variables(Access=private)
+    F_L = {zeros(N_L,1),'mol/s'};
+    F_S = {zeros(N_S,1),'mol/s'};
+    Phi_L = {0,'W'};
+    Phi_S = {0,'W'};
+  end
+
+  branches
+    F_L : * -> Port_B_L.F
+    F_S: * -> Port_B_S.F
+    Phi_L : * -> Port_B_L.Phi;
+    Phi_S : * -> Port_B_S.Phi;
+  end
+  
+  intermediates
+    R = Port_B_L.R;
+    T = Port_B_L.T;
+    x_L = checkMoleFractions(Port_B_L.x);
+    c_L = Port_B_L.gamma.*getConc(x_L,getProperty_T(Port_B_L.table_T,Port_B_L.table_Vm,T)); 
+    x_S = checkMoleFractions(Port_B_S.x);
+    c_S = getConc(x_S,getProperty_T(Port_B_S.table_T,Port_B_S.table_Vm,T));
+
+    sc_L =  (1*(nu_L ~= 0))'*value(c_L,'mol/l');
+    sc_S = (1*(nu_S ~= 0))'*value(c_S,'mol/l');
+    
+    lambda_S = (sum(1*(lt(sc_S,0)))==0);
+  end
+
+  intermediates
+     r = k*(lambda_S-sc_L./K0);
+  end
+  
+  equations
+    F_L == A*nu_L*r;
+    F_S == A*nu_S*r;
+    Phi_L == 0;
+    Phi_S == 0;
+  end
+
+end

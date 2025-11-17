@@ -1,0 +1,49 @@
+import ChemReactorDesign.Basic.Interface.*;
+import ChemReactorDesign.Basic.Interface.enum.*;
+
+component SensorThrough
+  % Sensor Through : 1.0
+  % Sensor for Molar Fluxes 
+  %
+  % Copyright Klaus Schnitzlein - 28.07.2025
+  
+  nodes
+    Port_A = Interface; %
+    Port_B = Interface; %
+  end
+  
+  outputs
+    Fout; % F
+  end
+  
+  annotations
+    Icon = './Sensor.svg';
+    Port_A : Side = left;
+    Port_B : Side = right;
+    Fout: Side = top;
+    UILayout = [...
+      UIGroup('Options',selectSpecies)];
+    Fout : LoggingUnit = 'mol/s';
+  end
+
+  parameters
+    selectSpecies = {[1,2],'1'};
+  end
+  
+  parameters(Access = private)
+    N = Port_A.N;
+  end
+
+  variables(Access=private)
+    F = {zeros(N,1),'mol/s' };
+  end
+  
+  branches
+    F : Port_A.F -> Port_B.F;
+  end
+  
+  equations
+    Port_A.Theta == Port_B.Theta;
+    Fout == F(selectSpecies);
+  end
+end

@@ -1,0 +1,134 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Interface.enum.*;
+import ChemReactorDesign.Basic.Interface.*;
+
+component (Hidden = true) BaseRate
+  % Base Class for Interface Rates
+  %
+  %   (c) Klaus Schnitzlein - 17.11.2025
+
+  inputs
+    A = {0,'cm^2'}; % A
+  end
+
+  inputs(ExternalAccess = none)
+    Tin = {298.15,'K'}; % T
+  end
+
+  nodes
+    Port_B = Interface;  % 
+  end
+  
+  annotations
+    Port_B : Side = left;
+    [A,Tin] : Side = top;
+  end
+
+  parameters
+    reversibility = Reversibility.Irreversible; % Reversibility of Reaction
+    temperatureInput = OnOff.Off;  % Temperature Input
+    kfinfA = {0,'mol/(m^2*s)'};    % Rate Constant
+    Ea = {0,'kJ/mol'};             % Activation Energy
+    nu  = {[-1; 2],'1'};           % Stoichiometric Coefficients
+  end
+
+  parameters(ExternalAccess = none)
+    calculate_Ka = OnOff.On;   % Calculate Equilibrium Constant
+    table_T = {[300,400],'K'}; % Temperatur Table
+    table_Ka  = {[1,2],'1'};   % Equilibrium Constant Table
+    T0 = {298.15,'K'};         % Temperature
+    Ka0 = {1.0e+30,'1'};       % Equilibrium Constant (Standard Conditions)
+    kappaf = {[0 0],'1'};      % Orders of Reaction (Forward Reaction)
+  end
+
+  parameters(Access = protected)
+    N = Port_B.N;
+    row_nu = reshape(nu,N,1);
+  end
+
+  if(temperatureInput == OnOff.On)
+    annotations
+      Tin : ExternalAccess = modify;
+    end
+  else
+    annotations
+      T0 : ExternalAccess = modify;
+    end
+  end
+
+  if(reversibility == Reversibility.Reversible)
+    annotations
+      calculate_Ka : ExternalAccess = modify;
+    end
+    if(calculate_Ka == simscape.enum.onoff.off)
+      annotations
+        Ka0 : ExternalAccess = modify;
+      end
+    else
+      annotations
+        [table_T,table_Ka] : ExternalAccess = modify;
+      end
+    end
+    parameters
+      [row_kappaf,row_kappab] = getKappa(row_nu);
+    end
+  else
+    annotations
+      kappaf: ExternalAccess = modify;
+    end
+    parameters
+      row_kappaf = reshape(kappaf,N,1);
+      row_kappab = {zeros(N,1),'1'};
+    end
+    equations
+      assert(length(kappaf) == N);
+    end
+  end
+  
+  variables(Access=protected)
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_B.F_nom};
+    r = {0,'mol/s'};
+  end
+
+  branches
+    F : * -> Port_B.F;
+  end
+
+  intermediates
+    R = Port_B.R;
+    T = if(temperatureInput == OnOff.On)
+      Tin
+    else
+      T0
+    end;
+    kfinf = kfinfA*exp(-Ea/(R*T));
+    a = max_noZC(Port_B.Theta,eps); % darf nicht 0 sein, wegen exp
+
+    kf = kfinfA*A;
+    Ka = if(reversibility == Reversibility.Reversible && calculate_Ka == OnOff.On)
+      tablelookup(table_T,table_Ka,T,interpolation=linear,extrapolation=nearest);
+    else
+      Ka0
+    end;
+
+    prodf = prod(a.^row_kappaf);
+    lambdaf = (eq(sum(1*(eq(row_kappaf,0) & lt(row_nu,0) & le(a,0))),0)); % neu
+    prodb = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      prod(a.^row_kappab)
+    end;
+    lambdab = if(reversibility == Reversibility.Irreversible),
+      1
+    else
+      (eq(sum(1*(eq(row_kappab,0) & gt(row_nu,0) & le(a,0))),0)); % neu 
+    end
+  end
+
+  equations
+    F == row_nu*r;
+    assert(length(nu) == N);
+  end
+
+end

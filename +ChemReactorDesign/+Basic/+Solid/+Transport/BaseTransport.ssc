@@ -1,0 +1,76 @@
+import ChemReactorDesign.Basic.Solid.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+
+component (Hidden = true) BaseTransport
+  % Base Class for Mass and Heat Transport
+  %
+  %   (c) Klaus Schnitzlein - 27.05.2025
+   
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % S
+  end
+
+  nodes
+    Port_A = Solid; % 
+    Port_B = Solid; % 
+  end
+  
+  annotations
+    Port_A : Side = left;
+    Port_B : Side = right;
+    Ain : Side = top;
+  end
+
+  parameters
+    areaInput = OnOff.Off;       % Area Input
+    A0 = {1,'m^2'};              % Cross Sectional Area
+    delta  = {1.0e-03,'m'};      % Transport Distance
+  end
+
+  parameters(Access = protected)
+    N = Port_A.N;
+  end
+
+  if(areaInput ==OnOff.On)
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  end
+
+  variables(Access = protected)
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_A.F_nom};
+    Phi = {value={0,'W'},nominal=Port_A.Phi_nom};
+    A = {0,'m^2'};
+  end
+
+  branches
+    F : Port_A.F -> Port_B.F;
+    Phi : Port_A.Phi -> Port_B.Phi;
+  end
+
+  intermediates
+    xA = checkMoleFractions(Port_A.x);
+    xB = checkMoleFractions(Port_B.x);
+    cA = getConc(xA,getProperty_T(Port_A.table_T,Port_A.table_Vm,Port_A.T));
+    cB = getConc(xB,getProperty_T(Port_A.table_T,Port_A.table_Vm,Port_B.T));
+    pA = Port_A.p;
+    pB = Port_B.p;
+    TA = Port_A.T;
+    TB = Port_B.T;
+    HA = Port_A.H;
+    HB = Port_B.H;
+  end
+ 
+ equations
+   A == if(areaInput == OnOff.On),
+     Ain
+   else
+     A0
+   end;
+   assert(A > 0);
+   assert(delta > 0);
+ end
+end
+      

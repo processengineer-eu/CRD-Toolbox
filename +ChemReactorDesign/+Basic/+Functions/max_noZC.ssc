@@ -1,0 +1,9 @@
+function val = max_noZC(a,b)
+  % max function avoiding zero crossing
+  %
+  % (c) Klaus Schnitzlein - 03.01.2025
+  
+  definitions
+    val = .if(ge(a,b)), a .else b .end;
+  end
+end

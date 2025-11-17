@@ -1,0 +1,40 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.Transport.*;
+
+component ConvectionP < BaseConvection
+  % Pressure Induced Convection : 1.5
+  % Pressure Induced Convective Mass Transport
+  %   - with Upstream Conditions
+  %
+  %   (c) Klaus Schnitzlein - 05.08.2025
+
+  annotations
+    Icon = './ConvectionP.svg';
+    [yin,qout] : Side = top;
+    [A0,delta,areaInput] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',controlInput,flowOutput,checkValve),...
+      UIGroup('MassTransport',b0,b1)];
+    q : LoggingUnit = 'l/s';
+  end
+
+  parameters
+    b0 = {1.0,'bar*s/m^3'};         % Laminar Flow Parameter
+    b1 = {1.0e-10,'bar*s^2/m^6'};   % Turbulent Flow Parameter
+  end
+
+  parameters(Access = private)
+    q_Threshold = {1.0e-06,'l/s'};
+  end
+
+  intermediates
+    beta0 = b0;
+    beta1 = b1;
+  end
+
+  equations
+    deltap*y == beta0*q+beta1*regSquare(q,0.01*q_Threshold);
+  end
+    
+end

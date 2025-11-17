@@ -1,0 +1,59 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Functions.*;
+
+domain Liquid
+  % Liquid Domain
+  % Definition of an Ideal Liquid Mixture
+  %
+  %   (c) Klaus Schnitzlein - 17.11.2025
+
+  parameters
+    model = ThermodynamicModel.Ideal;        % Thermodynamic Model
+    N = {2,'1'};                             % Number of Species
+    Ids = {[1;2],'1'};                       % Species Ids
+    Mw = {zeros(N,1),'g/mol'};               % Molecular Weights
+    charge = {zeros(N,1),'1'};               % Charges
+    table_T = {[273,400],'K'};               % Temperature Table
+    table_Vm = {zeros(2,N),'l/mol'};         % Molar Volume Table
+    table_cp = {zeros(2,N),'J/(mol*K)'};     % Specific Heat Table
+    table_H = {zeros(2,N),'kJ/mol'};         % Enthalpy Table
+    table_G = {zeros(2,N),'kJ/mol'};         % Gibbs Energy Table
+    table_mu = {zeros(2,N),'Pa*s'};          % Dynamic Viscosity Table
+    table_lambda = {zeros(2,N),'W/(m*K)'};   % Heat Conductivity Table
+    table_Hv = {zeros(2,N),'kJ/mol'};        % Heat of Vaporization Table
+    table_pvap = {zeros(2,N),'Pa'};          % Vaporization Pressure
+    R = {8.3143,'J/(mol*K)'};                % Universal Gas Constant
+    Tref = {298.15,'K'};                     % Reference Temperature
+    Far = {9.6485e+04,'A*s/mol '};           % Faraday Constant
+    g = {9.81,'m/s^2'};                      % Acceleration of Gravity
+    A = {eye(N,N),'cal/mol'};                % Interaction Parameter A
+    alpha = {zeros(N,N),'1'};                % NRTL Interaction Parameter alpha
+    F_nom = {1.0e-06,'mol/s'};               % Nominal Value for Molar Flow Rates
+    Phi_nom = {1.0,'W'};                     % Nominal Value for Energy Flow Rate
+    Q_nom = {1.0,'W'};                       % Nominal Value for Heat Flow Rate
+    H_nom = {1.0e+02,'kJ/mol'};              % Nominal Value for Enthalpies
+  end
+
+  variables
+    x = {value={zeros(N-1,1),'1'},imax={1,'1'}}; % Mole Fractions
+    p = {1,'bar'};                            % Pressure
+    T = {value={298.15,'K'},imin={0,'K'}};    % Temperature
+    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};        % Molar Enthalpies
+    gamma = {value={ones(N,1),'1'},imin={0,'1'}};           % Activity Coefficients
+  end
+  
+  variables(Balancing = true)
+    F = {zeros(N,1),'mol/s'}; % Molar flow rates
+    Phi = {0,'W'};            % Energy flow rate
+  end
+
+  equations
+    H == getProperty_T(table_T,table_H,T);
+    gamma == if(model == ThermodynamicModel.NRTL)
+      NRTL(A,alpha,[x;1-sum(x)],T);
+    else
+      {ones(N,1),'1'};
+    end
+  end
+end

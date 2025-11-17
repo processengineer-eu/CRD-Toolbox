@@ -1,0 +1,12 @@
+import ChemReactorDesign.Basic.Functions.*;
+
+function val = checkMoleFractions(x)
+  
+  % Calculate Mole Fractions for all Species
+  % (c) Klaus Schnitzlein - 25.09.2025
+
+  definitions
+    xx = max_noZC(x,0);
+    val = [xx;1-sum(xx)];
+  end
+end

@@ -1,0 +1,46 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Solid.Volumes.*;
+
+component Overhead <BaseVolume
+  % Overhead : 1.5 : fixed
+  % OpenVolume with Gas Overhead 
+  %   with equal temperature for Gas and Solid
+  %
+  %   (c) Klaus Schnitzlein - 08.07.2025
+
+  annotations
+    pin : Side = top;
+    Icon = './Overhead.svg';
+    pressureInput : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',volumeOutput,isothermalOperation),...
+      UIGroup('Geometry',Vmax,A0,h0),...
+      UIGroup('Gas',cpGas),...
+      UIGroup('OperatingConditions',m0,p0,T0),...
+      UIGroup('Nominal Values',n_nom)];
+  end
+  
+  parameters
+    Vmax = {1,'l'};  % Maximum Volume
+    cpGas = {1.0e-03,'kJ/(mol*K)'}; % Specific Heat Gasphase
+  end
+
+  parameters(Access = private)
+    V0 = sum(n0.*getProperty_T(Port_A.table_T,Port_A.table_Vm,T0));
+    nGas = p0*(Vmax-V0)/(Port_A.R*T0); % Stoffmenge Gas
+  end
+
+  equations(Initial = true)
+    pI == p0;
+  end
+  
+  equations
+    if(isothermalOperation == OnOff.On)
+      T.der == 0;
+    else
+      sum(F.*H)+(nGas*cpGas+sum(max_n.*cp))*T.der == Phi+Q+V*pI.der;
+    end
+     pI == p0*(Vmax-V0)/(Vmax-V);
+  end
+end

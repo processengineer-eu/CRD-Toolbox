@@ -1,0 +1,80 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Gas.enum.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
+  % Balloon : 1.5 : fixed
+  % Variable Homogeneous Gas Volume 
+  %
+  %   (c) Klaus Schnitzlein - 15.08.2025
+  
+  inputs(ExternalAccess = none)
+    pin = {0,'bar'}; % p
+  end
+
+  annotations
+    pin : Side = top;
+    Icon = './Balloon.svg';
+    UILayout = [...
+      UIGroup('Options',pressureInput,volumeOutput,compressionWork,isothermalOperation),...
+      UIGroup('Geometry',V0),...
+      UIGroup('OperatingConditions',x0,p0,T0)];
+    n : LoggingUnit = 'mol';
+  end
+
+  parameters
+    volumeOutput = OnOff.Off; % Volume Output
+    pressureInput = OnOff.Off; % Pressure Input
+  end
+
+  parameters(Access = protected)
+    n0 = p0*V0/(Port_A.R*T0);
+  end
+
+  if(volumeOutput == OnOff.On)
+    annotations
+      Vout : ExternalAccess = modify;
+    end
+  end
+
+  if(pressureInput == OnOff.On) 
+    annotations
+      p0 : ExternalAccess = none;
+      pin : ExternalAccess = modify;
+    end  
+  end
+
+  variables(Access = protected)
+    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n0};
+    V = {value = V0,nominal = V0,priority = priority.high};
+    p = {value = p0};
+  end
+
+  equations(Initial = true)
+    n == row_x0*V0*p/(z*R*T0);
+  end
+
+  equations
+    n.der == F;
+    if(isothermalOperation == OnOff.On)
+      T.der == 0
+    else
+      sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q +...
+        if(compressionWork == OnOff.On)
+          V*p.der
+        else
+          0
+        end;
+    end
+    V == z*sum(n)*R*T/p;
+    p == if(pressureInput == OnOff.On),
+      pin
+    else
+      p0
+    end;
+
+    Vout == V;
+    Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    Port_A.p == p;
+    end
+end

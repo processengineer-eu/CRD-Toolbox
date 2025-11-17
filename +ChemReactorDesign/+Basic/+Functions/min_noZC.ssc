@@ -1,0 +1,9 @@
+function val = min_noZC(a,b)
+  % min function avoiding zero crossing
+  %
+  % (c) Klaus Schnitzlein - 03.01.2025
+  
+  definitions
+    val = .if(le(a,b)), a .else b .end;
+  end
+end

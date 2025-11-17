@@ -1,0 +1,12 @@
+function y = Sigmoid(x,c,xsmall)
+  % Smooth representation of a step function
+  % (c) Klaus Schnitzlein - 12.09.2025
+
+  definitions
+    a = 100/xsmall;
+    help = a*(x-c);
+    k = 2;
+    y = 0.5*(1 + help/(1+help.^k).^(1/k));
+  end
+
+end

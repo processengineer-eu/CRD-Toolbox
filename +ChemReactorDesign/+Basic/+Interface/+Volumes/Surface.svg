@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On;"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="200"
+      viewBox="0 0 200 200" 
+      >
+  <g d:options="Port:L0">
+    <rect x="0" y="0" width="200" height="200"
+	  style="fill:none;stroke:black;stroke-width:2" />
+    <rect id="rect_3" fill="none" stroke="black" stroke-width="3"
+	   d:options="PreAdjustStrokeWidth:None;"
+	   x="30" y="40" width="140" height="130" rx="0" ry="0"/>
+
+    <path d="M40,115 h120" stroke="black" fill="none" />
+    <path d="M60,115 l-20,20" stroke="black" fill="none" />
+    <path d="M80,115 l-20,20" stroke="black" fill="none" />
+    <path d="M100,115 l-20,20" stroke="black" fill="none" />
+    <path d="M120,115 l-20,20" stroke="black" fill="none" />
+    <path d="M140,115 l-20,20" stroke="black" fill="none" />
+    <path d="M160,115 l-20,20" stroke="black" fill="none" />
+    <circle cx="70" cy="105" r="10" stroke="black" stroke-width="2" fill="none" />
+    <circle cx="100" cy="105" r="10" stroke="black" stroke-width="2" fill="none" />
+    <circle cx="130" cy="105" r="10" stroke="black" stroke-width="2" fill="none" />
+  </g>
+</svg>

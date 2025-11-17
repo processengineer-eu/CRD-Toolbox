@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;Frame:On;"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="200"
+      height="200"
+      viewBox="0 0 200 200" 
+      >
+  <g  d:options="Port:R0">
+    <rect x="0" y="0" width="200" height="200"
+	  fill="none" stroke="black" stroke-width="1" />
+    <ellipse cx="100" cy="50" rx="60" ry="15"
+             style="fill:none;stroke:black;stroke-width:1" />
+    <path d="M 40 150 C 70 170, 130 170, 160 150" stroke="black" fill="none"/>
+    <polyline points="40,50 40,150" stroke="black" />
+    <polyline points="160,50 160,150" stroke="black" />
+  </g>
+</svg>

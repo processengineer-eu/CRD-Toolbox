@@ -1,0 +1,27 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component ConvectionV < BaseConvection
+  % Velocity Induced Convection : 1.5
+  % Velocity Induced Convective Mass and Heat Transport
+  %   - at Upstream Conditions
+  %
+  %   (c) Klaus Schnitzlein - 08.07.2025
+
+  annotations
+    Icon = './ConvectionV.svg';
+    yin : Side = top;
+    [A0,delta,areaInput,checkValve] : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',controlInput),...
+      UIGroup('MassTransport',q0)];
+  end
+
+  parameters
+    q0 = {0,'cm^3/min'}; % Volumetric Flow Rate
+  end
+
+  equations
+    q == y*q0;
+  end
+
+end

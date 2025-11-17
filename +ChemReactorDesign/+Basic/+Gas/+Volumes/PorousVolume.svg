@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:d="http://www.mathworks.com/blockgraphics"
+     xmlns:xlink="http://www.w3.org/1999/xlink" 
+     version="1.1" id="svg"
+     width="200" height="200"
+     viewBox="0 0 200 200" 
+     d:options="Background:Transparent;PreserveAspect:On;Resize:FitToBlock;Frame:On;">
+  <g id="group" d:options="Orientation:Fixed;Port:L0;">
+    <rect id="rect" d:options="PreAdjustStrokeWidth:None" fill="none" stroke="black" stroke-width="3" style="fill:none;"
+	  x="0" y="0" width="200" height="200" rx="0" ry="0"/>
+    <!-- <rect id="rect_1"  d:options="PreAdjustStrokeWidth:None" fill="black" stroke="black" stroke-width="2"
+	  x="3" y="197" width="197" height="3" rx="0" ry="0"/>
+    <rect id="rect_2"  d:options="PreAdjustStrokeWidth:None" fill="black" stroke="black" stroke-width="2"
+	  x="197" y="3" width="3" height="197" rx="0" ry="0"/> -->
+    <rect id="rect_3"  d:options="PreAdjustStrokeWidth:None" x="30" y="40" width="140" height="130" rx="0" ry="0"
+	  fill="lightgrey" stroke-width="3" stroke="black" />
+    <ellipse id="ellipse"  d:options="PreAdjustStrokeWidth:None" cx="70" cy="125" rx="30" ry="10"
+      	     style="fill:none;stroke:black;stroke-width:2" />
+    <ellipse id="ellipse_4"  d:options="PreAdjustStrokeWidth:None" cx="130" cy="125" rx="30" ry="10"
+	     style="fill:none;stroke:black;stroke-width:2" />
+    <path id="path"  d:options="PreAdjustStrokeWidth:None" d=" M 100,125 L 100,55"
+	  style="fill:none;stroke:black;stroke-width:2" />
+  </g>
+</svg>
+

@@ -1,0 +1,122 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.Gas.enum.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+component Properties
+  % Properties Gas : 1.5 : fixed
+  %
+  %   Copyright Klaus Schnitzlein - 17.11.2025
+  
+  nodes
+    Port_B = Gas(...
+      model = model,...
+      N = N,...
+      Ids = Ids,...
+      Mw = Mw,...
+      Dv = Dv,...
+      table_T = table_T,...
+      table_cp = table_cp,...
+      table_H = table_H,...
+      table_G = table_G,...
+      table_mu = table_mu,...
+      table_lambda = table_lambda,...
+      Tc = tmp_Tc,...
+      pc = tmp_pc,...
+      omega = tmp_omega,...
+      k0 = tmp_k0,...
+      F_nom = F_nom,...
+      Phi_nom = Phi_nom,...
+      Q_nom = Q_nom,...
+      H_nom = H_nom,...
+      Hres_nom = Hres_nom); %
+    end
+
+  annotations
+    Icon = './Properties.svg';
+    Port_B : Side = right;
+    UILayout = [...
+      UIGroup('Thermodynamics',model),....
+      UIGroup('Species',N,Ids),...
+      UIGroup('Data',Mw,Dv,table_T,table_cp,table_H,...
+      table_G,table_mu,table_lambda,Tc,pc,omega,k0),...
+      UIGroup('Nominal Values',F_nom,Phi_nom,Q_nom,H_nom,Hres_nom)];
+end
+
+  parameters
+    model = ThermodynamicModel.IdealGas;     % Thermodynamic Model
+    N  = {2,'1'};                            % Number of Species
+    Ids = {[1,2],'1'};                       % Species Identifiers
+    Mw = {zeros(2,1),'g/mol'};               % Molar Weights
+    Dv = {zeros(2,1),'1'};                   % Diffusion Volumes
+    table_T = {[200,400],'K'};               % Temperature Table
+    table_cp = {zeros(2,2),'J/(mol*K)'};     % Specific Heats Table
+    table_H  = {zeros(2,2),'kJ/mol'};        % Enthalpy Table
+    table_G  = {zeros(2,2),'kJ/mol'};        % Gibbs Energy Table
+    table_mu = {zeros(2,2),'Pa*s'};          % Dynamic Viscosity Table
+    table_lambda  = {zeros(2,2),'W/(m*K)'};  % Heat Conductivity Table
+    F_nom = {1.0e-06,'mol/s'};               % Nominal Value for Molar Flow Rate
+    Phi_nom = {1.0,'W'};                     % Nominal Value for Energy Flow Rate
+    Q_nom = {1.0,'W'};                       % Nominal Value for Heat Flow Rate
+    H_nom = {1.0e+02,'kJ/mol'};              % Nominal Value for Enthalpies
+    Hres_nom = {1.0,'kJ/mol'};               % Nominal Value for Departure Enthalpy
+  end
+
+  parameters(ExternalAccess = none)
+    pc = {ones(2,1),'bar'};                % Critical Pressures
+    Tc = {298.15*ones(2,1),'K'};           % Critical Temperatures
+    omega = {ones(2,1),'1'};               % Acentricity Factors
+    k0 = {zeros(2,2),'1'};                 % Interaction Coefficients for EOS
+  end
+ 
+  parameters(ExternalAccess = none)
+    nT = length(table_T);
+  end
+
+  if(model == ThermodynamicModel.IdealGas)
+    parameters(ExternalAccess = none)
+      tmp_Tc = {298.15*ones(N,1),'K'};
+      tmp_pc = {ones(N,1),'bar'};
+      tmp_omega = {ones(N,1),'1'};
+      tmp_k0 = {ones(N,N),'1'};
+    end
+  else
+    parameters(ExternalAccess = none)
+      tmp_Tc = Tc;
+      tmp_pc = pc;
+      tmp_omega = omega;
+      tmp_k0 = k0;
+    end
+  end
+
+  if(model == ThermodynamicModel.PengRobinson)
+    annotations
+      [pc,Tc,omega,k0] : ExternalAccess = modify;
+    end
+    equations
+      assert(length(omega) == N);
+      assert(length(Tc) == N);
+      assert(length(pc) == N);
+      assert(size(k0,1) == N && size(k0,2) == N,...
+        'invalid size of k0');
+    end
+  end
+
+  equations
+    assert(N >= 2);
+    assert(length(Ids) == N);
+    assert(length(Mw) == N);
+    assert(length(Dv) == N);
+    assert(size(table_cp,1) == nT && size(table_cp,2) == N,...
+      'table_cp: invalid size');
+    assert(size(table_H,1) == nT && size(table_H,2) == N,...
+      'table_H: invalid size');
+    assert(size(table_G,1) == nT && size(table_G,2) == N,...
+      'table_G: invalid size');
+    assert(size(table_mu,1) == nT && size(table_mu,2) == N,...
+      'table_mu: invalid size');
+    assert(size(table_lambda,1) == nT && size(table_lambda,2) == N,...
+      'table_lambda: invalid size');
+  end
+  
+end

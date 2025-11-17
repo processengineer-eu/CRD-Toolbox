@@ -1,0 +1,43 @@
+import ChemReactorDesign.Basic.Functions.*;
+
+domain Solid
+  % Solid Domain
+  % Definition of a Solid Mixture
+  %
+  %   (c) Klaus Schnitzlein - 17.11.2025
+
+  parameters
+    N  = {2,'1'};                          % Number of Species
+    Ids = {[1;2],'1'};                     % Species Identifier
+    Mw = {ones(N,1),'g/mol'};              % Molar Weights
+    table_T = {[273,400],'K'};             % Temperature Table
+    table_cp = {zeros(2,N),'J/(mol*K)'};   % Specific Heats Table
+    table_H = {zeros(2,N),'kJ/mol'};       % Enthalpy Table
+    table_G = {zeros(2,N),'kJ/mol'};       % Gibbs Energy Table
+    table_Vm = {zeros(2,N),'l/mol'};       % Molar Volumes Table
+    table_lambda = {zeros(2,N),'W/(m*K)'}; % Heat Conductivity Table
+    R = {8.3143,'J/(mol*K)'};              % Universal Gas Constant
+    g = {9.81,'m/s^2'};                    % Acceleration of Gravity
+    F_nom = {1.0e-06,'mol/s'};             % Nominal Value for Molar Flow Rates
+    Phi_nom = {1.0,'W'};                   % Nominal Value for Energy Flow Rate
+    Q_nom = {1.0,'W'};                     % Nominal Value for Heat Flow Rate
+    H_nom = {1.0e+02,'kJ/mol'};            % Nominal Value for Enthalpies
+end
+
+  variables
+    x = {value={zeros(N-1,1),'1'},imin={0,'1'},imax={1,'1'}}; % Mole Fractions
+    p = {value={1.0,'bar'}};             % Pressure
+    T = {298.15,'K'};                    % Temperature
+    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};   % Molar Enthalpies
+ end
+  
+  variables(Balancing = true)
+    F = {zeros(N,1),'mol/s'};       % Molar flow rates
+    Phi = {0,'W'};                  % Energy flow rate
+  end
+
+  equations
+    H == getProperty_T(table_T,table_H,T);
+  end
+end
+

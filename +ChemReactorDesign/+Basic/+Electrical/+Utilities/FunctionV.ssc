@@ -1,0 +1,99 @@
+import ChemReactorDesign.Basic.Electrical.*;
+import ChemReactorDesign.Basic.Electrical.enum.*;
+import foundation.electrical.*;
+
+component FunctionV
+  % Voltage Function Generator : 1 : fixed
+  %
+  % Copyright Klaus Schnitzlein/The MathWorks - 06.01.2023
+      
+  nodes
+    p = electrical; % +
+    n = electrical; % -
+  end
+
+  annotations
+    p : Side = left;
+    n : Side = left;
+    UILayout = [...
+      UIGroup('Options',mode),...
+      UIGroup('Parameters',constant_value,period,amplitude,...
+                           offset,delay,slope,start_time,...
+                           initial_value,initial_output,...
+                           step_time,final_value)];
+  end
+
+  parameters
+    mode = FunctionGeneratorMode.constant; % mode Select
+  end 
+  
+  parameters(ExternalAccess=none)
+    constant_value = {0,'V'};     % Constant Value
+    period         = {1,'s'};     % Period Time
+    amplitude      = {1,'V'};     % Amplitude
+    offset         = {0,'V'};     % Offset
+    delay          = {0,'s'};     % Phase-Delay
+    slope          = {1,'V/s'};   % Slope
+    start_time     = {0,'s'};     % Start time
+    initial_value  = {0,'V'};     % Initial value
+    initial_output = {0,'V'};     % Initial output
+    step_time      = {1,'s'};     % Step time
+    final_value    = {1,'V'};     % Final value
+  end
+  
+  variables(Access=private)
+    i = { 0, 'A' };
+    v = { 0, 'V' };
+  end
+  
+  branches
+    i : p.i -> n.i;
+  end
+  
+  if(mode == FunctionGeneratorMode.constant)
+    annotations
+      Icon = './constant.svg';
+      constant_value : ExternalAccess=modify;
+    end
+    equations
+      v == p.v-n.v;
+      v == constant_value;
+    end
+  elseif(mode == FunctionGeneratorMode.step)
+    annotations
+      Icon = './step.svg';
+      [initial_value,final_value] : ExternalAccess=modify;
+    end
+    equations
+      v == p.v-n.v;
+      if time < step_time
+        v == initial_value;
+      else
+        v == final_value;
+      end
+    end
+  elseif(mode == FunctionGeneratorMode.ramp)
+    annotations
+      Icon = './ramp.svg';
+      [start_time,initial_output,slope] : ExternalAccess=modify;
+    end
+    equations
+      v == p.v-n.v;
+      if time < start_time
+        v == initial_output;
+      else
+        v == initial_output + slope * (time-start_time);
+      end
+    end
+  elseif(mode == FunctionGeneratorMode.triangle)
+    annotations
+      Icon = './triangle_wave.svg';
+      [amplitude,delay,period,offset] : ExternalAccess=modify;
+    end
+    equations
+      v == p.v-n.v;
+      % problematisch ist das abs() - what to do?
+      v == amplitude*2*abs(mod(time+delay,period)-period/2)/period+offset;
+    end
+  end
+end

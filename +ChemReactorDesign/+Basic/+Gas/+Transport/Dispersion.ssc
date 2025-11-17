@@ -1,0 +1,23 @@
+import ChemReactorDesign.Basic.Gas.Transport.*;
+
+component Dispersion < DiffusionK(...
+    D = Dz*ones(N,1));
+  % Dispersion : 1.5
+  % Dispersive Mass Transport
+  %
+  %   (c) Klaus Schnitzlein - 28.07.2025
+
+  annotations
+    Icon = './Dispersion.svg';
+    Dk : ExternalAccess = none;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup("Geometry",A0,delta),...
+      UIGroup('MassTransport',Dz)];
+  end
+
+  parameters
+    Dz = {1.0e-06,'m^2/s'};  % Dispersion Coefficient
+  end
+
+end

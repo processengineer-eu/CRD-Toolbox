@@ -1,0 +1,130 @@
+import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
+import ChemReactorDesign.Basic.Liquid.Transfer.*;
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Liquid.Functions.*;
+import ChemReactorDesign.Basic.Gas.*;
+
+component GLE
+	% GLE: 1.5 : fixed
+  % Gas-Liquid Equilibrium - Dissolution of a Gas in a Liquid Mixture
+  %
+  %   (c) Klaus Schnitzlein - 10.10.2025
+ nodes
+    Port_B_G = Gas;     %
+    Port_B_L = Liquid;  %
+  end
+
+  inputs(ExternalAccess = none)
+    Ain = {0,'m^2'}; % S
+  end
+
+  annotations
+    Icon = './Partition.svg';
+    Port_B_G : Side = right;
+    Port_B_L : Side = left;
+    Ain : Side = top;
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0),...
+      UIGroup('Stoichiometry',nu_G,nu_L),...
+      UIGroup('Thermodynamics',table_T,table_Henry,table_dHs),...
+      UIGroup('Kinetics',k)];
+    [r] : LoggingUnit = 'mol/(m^2*s)';
+  end
+  
+  parameters(Access = private)
+    N_L = Port_B_L.N;
+    N_G = Port_B_G.N;
+    M = size(nu_L,2);
+  end
+  
+  parameters
+    areaInput = OnOff.Off;                 % AreaInput
+    nu_L = {[1;0],'1'};                    % Stoichiometric Coefficients (Liquid)
+    nu_G = {[-1;0],'1'};                   % Stoichiometric Coefficients (Gas)
+    k = {0,'mol/(m^2*s)'};                 % Rate Constants
+    A0 = {1,'m^2'};                        % Exchange Area
+    table_T = {[273,400],'K'};             % Temperature Table
+    table_Henry = {zeros(2,2),'bar'};      % Henry Constant Table
+    table_dHs = {zeros(2,2),'kJ/mol'};     % Enthalpy of Dissolution Table
+  end
+
+  equations
+    assert(size(nu_L,1) == N_L && size(nu_L,2) == M,...
+    'invalid number of stoichiometric coefficients for liquid phase');
+    assert(size(nu_G,1) == N_G && size(nu_G,2) == M,...
+    'invalid number of stoichiometric coefficients for gas phase');
+    assert(sum(sum(1*(nu_L == 1),1)) == M,...
+      'invalid stoichiometric coefficients for liquid phase');
+    assert(sum(sum(1*(nu_G == -1),1)) == M,...
+      'invalid stoichiometric coefficents for gas phase');
+    assert(size(table_Henry,1) == length(table_T) && ...
+           size(table_Henry,2) == N_G,...
+      'invalid size of henry coefficients table');
+    assert(size(table_dHs,1) == length(table_T) && ...
+           size(table_dHs,2) == N_G,...
+      'invalid size of dissolution enthalpies');
+    assert(length(k) == M,...
+      'invalid size of rate constants');
+  end
+
+  if(areaInput == OnOff.On)
+    equations
+      A  == Ain;
+    end
+    annotations
+      Ain : ExternalAccess = modify;
+      A0 : ExternalAccess = none;
+    end
+  elseif(areaInput == OnOff.Off)
+    annotations
+      A0 : ExternalAccess = modify;
+    end
+    equations
+      A == A0;
+    end
+  end
+
+  variables(Access=private)
+    F_G = {zeros(N_G,1),'mol/s'};
+    Phi_G = {0,'W'};
+    F_L = {zeros(N_L,1),'mol/s'};
+    Phi_L = {0,'W'};
+    A  = {0,'m^2'};
+  end
+
+  branches
+    F_G : * -> Port_B_G.F
+    Phi_G : * -> Port_B_G.Phi;
+    F_L : * -> Port_B_L.F;
+    Phi_L : * -> Port_B_L.Phi;
+  end
+  
+  intermediates
+    p = Port_B_G.p;
+    
+    sel_G = (1*(nu_G == -1))';
+    y = sel_G*checkMoleFractions(Port_B_G.x);
+    max_y = max_noZC(y,eps);
+    phi = sel_G*Port_B_G.phi;
+    sel_L = (1*(nu_L == 1))';
+    x = sel_L*checkMoleFractions(Port_B_L.x);
+    max_x = max_noZC(x,eps);
+
+    Henry = sel_G*getProperty_T(table_T,table_Henry,Port_B_L.T);
+    H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,Port_B_G.T);
+    H_L = getProperty_T(Port_B_L.table_T,Port_B_L.table_H,Port_B_L.T);
+    dHs = sel_G*getProperty_T(table_T,table_dHs,Port_B_L.T);
+
+    r = k*(phi.*max_y*p./Henry-sel_L*Port_B_L.gamma.*max_x);
+  end
+  
+  equations
+    F_G == nu_G*r*A;
+    F_L == nu_L*r*A;
+    Phi_G == sum(F_G.*H_G); 
+    Phi_L == sum(F_L.*H_L) + A*sum(r.*dHs); 
+  end
+end

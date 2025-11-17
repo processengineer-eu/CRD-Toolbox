@@ -1,0 +1,57 @@
+import ChemReactorDesign.Basic.Gas.*;
+import ChemReactorDesign.Basic.enum.*;
+
+component Reservoir 
+  % Reservoir : 1.5 : fixed 
+  % Reservoir 
+  %
+  %   (c) Klaus Schnitzlein - 28.05.2025
+
+  nodes
+    Port_A = Gas;   %
+  end
+
+  annotations
+    Icon = './Reservoir.svg';
+    Port_A : Side = left;
+    UILayout = [...
+      UIGroup('Operating Conditions',x0,p0,T0)];
+  end
+
+  parameters
+    x0 = {[0;1],'1'};   % Constant Mole Fractions
+    p0 = {1.0,'bar'};   % Constant Pressure
+    T0 = {298.15,'K'};  % Constant Temperature
+  end
+
+  parameters(Access = protected)
+    N = Port_A.N;
+  end
+
+  parameters(Access = private)
+    xx = reshape(x0,N,1);     
+    row_x0 = [xx(1:N-1);1-sum(xx(1:N-1))]; 
+  end
+  
+  variables(Access = protected)
+    F = {zeros(N,1),'mol/s'};
+    Phi = {0,'kJ/s'};
+    end
+
+  branches
+    F : Port_A.F -> *; 
+    Phi : Port_A.Phi -> *;
+  end
+
+  equations
+    Port_A.T == T0;
+    Port_A.p == p0;
+    Port_A.x == row_x0(1:N-1);
+      
+    assert(length(x0) == N);
+    assert(abs(sum(x0)-1)<1.0e-03,'sum(x0)!=1');
+    assert(sum(1*(x0<0)) == 0,...
+      'invalid mole fractions -> x0(i) < 0');
+  end
+     
+end

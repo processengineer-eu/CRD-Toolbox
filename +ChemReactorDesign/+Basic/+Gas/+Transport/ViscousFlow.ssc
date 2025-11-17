@@ -1,0 +1,33 @@
+import ChemReactorDesign.Basic.Functions.*;
+import ChemReactorDesign.Basic.Gas.Transport.*;
+import ChemReactorDesign.Basic.Gas.Functions.*;
+
+component ViscousFlow < BaseDiffusion
+  % Viscous Flow : 1.5
+  % Convective Mass and Heat Transport due to Viscous Flow 
+  %
+  %   (c) Klaus Schnitzlein - 31.01.2025
+   
+  annotations
+    Icon = './ViscousFlow.svg';
+    UILayout = [...
+      UIGroup('Options',areaInput),...
+      UIGroup('Geometry',A0,delta),....
+      UIGroup('MassTransport',B0)];
+  end
+
+  parameters
+    B0 = {1.0e-06,'m^2'};      % Permeability
+  end
+
+  intermediates
+    mu = getProperty_T(Port_A.table_T,Port_A.table_mu,T);
+    mum = getMixtureMu(Port_A.Mw,x,mu);
+  end
+
+  equations
+    J == -x*B0*p/(mum*R*T)*gradp;
+  end
+  
+end
+ 
