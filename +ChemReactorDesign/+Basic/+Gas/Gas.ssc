@@ -22,7 +22,7 @@ domain Gas
     table_lambda = {zeros(2,N),'W/(m*K)'}; % Heat Conductivity Table
     R = {8.3143,'J/(mol*K)'};              % Universal Gas Constant
     pref = {1.0,'bar'};                    % Reference Pressure
-    Tref = {298.15,'K'};                   % Reference Temperature
+    Tref = {298.15,'K'};                   % Reference Tempersature
     pc = {ones(N,1),'bar'};                % Critical Pressures
     Tc = {298.15*ones(N,1),'K'};           % Critical Temperatures
     omega = {ones(N,1),'1'};               % Acentricity Factors
