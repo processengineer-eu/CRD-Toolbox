@@ -10,7 +10,7 @@ component RateEG < BaseRate(reversibility = Reversibility.Reversible,...
   % RateEG : 1.5
   % Heterogeneous (Liquid-Gas) Electrochemical Reaction Rate
   %
-  %   (c) Klaus Schnitzlein - 10.10.2025
+  %   (c) Klaus Schnitzlein - 19.11.2025
   
   nodes
     Port_B_G = Gas;  %
@@ -52,8 +52,8 @@ component RateEG < BaseRate(reversibility = Reversibility.Reversible,...
   if(calculate_U0 == OnOff.On)
     intermediates
       H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,T);
-      S_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_S,T);
-      t_U0 = (-dGr-sum(row_nu_G.*(H_G-T*S_G)))/(n*Port_B.Far);
+      G_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_G,T);
+      t_U0 = (-dGr-sum(row_nu_G.*G_G))/(n*Port_B.Far);
     end
   else
     annotations
