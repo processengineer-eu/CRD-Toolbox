@@ -4,7 +4,7 @@ component DiffusionK < BaseDiffusion
   % DiffusionK : 1.5
   % Diffusive Mass Transport by Knudsen Diffusion
   %
-  %   (c) Klaus Schnitzlein - 20.03.2025
+  %   (c) Klaus Schnitzlein - 20.11.2025
 
   annotations
     Icon = './Diffusion.svg';
@@ -20,6 +20,7 @@ component DiffusionK < BaseDiffusion
 
   equations
     J == -Dk.*gradc;
+    assert(length(Dk) == N);
   end
 
 end
