@@ -25,7 +25,7 @@ defined. Iteratively applied, hierarchical multi-scale models can be
 created from scratch without the need of writing a single line of code
 (no-code programming).
 
-## Design Rule
+## Fundamentals
 
 The balance equation for the total amount of any extensive quantity
 &Theta; in a closed control volume is given by
