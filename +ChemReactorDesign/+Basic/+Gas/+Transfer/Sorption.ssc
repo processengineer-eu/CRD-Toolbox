@@ -8,7 +8,7 @@ component Sorption
   % Mass and Heat Transfer Rate for Sorption 
   % of a Single Species at an Interface
   %
-  %   (c) Klaus Schnitzlein - 02.07.2025
+  %   (c) Klaus Schnitzlein - 02.12.2025
   
   nodes
     Port_B_G = Gas; % 
@@ -59,10 +59,13 @@ component Sorption
   end
 
   equations
+    assert(length(dHads) == M);
+    assert(length(kads) == M);
+    assert(length(K0) == M);
     assert(size(nu_G,1) == N_G && size(nu_G,2) == M,...
-    'invalid number of stoichiometric coefficients for gas phase');
+      'invalid number of stoichiometric coefficients for gas phase');
     assert(size(nu_I,1) == N_I && size(nu_I,2) == M,...
-    'invalid number of stoichiometric coefficients for interface phase');
+      'invalid number of stoichiometric coefficients for interface phase');
     assert(sum(sum(1*(nu_G < 0),1)) == M,...
       'invalid stoichiometric coefficients for gas phase');
     assert(sum(sum(1*(nu_I > 0),1)) == M,...
@@ -111,7 +114,7 @@ component Sorption
     sTheta = (1*(nu_I ~= 0))'*Theta;
     Theta0 = max_noZC(1-sum(Theta),eps);
     n = sum(snu_I,1)';
-    K = reshape(K0,M,1).*exp(-reshape(dHads,M,1)/R*(1/T-1/{298.15,'K'})); % dHads != konstant
+    K = reshape(K0,M,1); %.*exp(-reshape(dHads,M,1)/R*(1/T-1/{298.15,'K'})); % dHads != konstant
   end
    
   if(select == SorptionMode.Langmuir)
@@ -145,6 +148,6 @@ component Sorption
   equations
     F_G == A*nu_G*r;
     F_I == A*nu_I*r;
-    Phi_G == sum(F_G.*Port_B_G.H) + A*sum(r.*reshape(dHads,M,1)); 
-   end
+    Phi_G == -A*sum(r.*reshape(dHads,M,1));
+  end
 end
