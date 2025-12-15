@@ -6,7 +6,7 @@ domain Gas
   % Gas Domain
   % Definition of a Gas Mixture 
   %
-  %   (c) Klaus Schnitzlein - 17.11.2025
+  %   (c) Klaus Schnitzlein - 15.12.2025
 
   parameters
     model = ThermodynamicModel.IdealGas;   % Thermodynamic Model
@@ -34,7 +34,7 @@ domain Gas
     Hres_nom = {1.0,'kJ/mol'};             % Nominal Value for Departure Enthalpy
   end
   
-  parameters(Access = private)
+  parameters % (Access = private)
     table_zdd = {generateCubicTable(),'1'}; % Table for Cubic Root Interpolation
   end
   
@@ -45,7 +45,7 @@ domain Gas
     H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom}; % Molar Enthalpies
     Hres = {value={0,'kJ/mol'},nominal=Hres_nom};    % Residual Mixture Enthalpy
     phi = {value={ones(N,1),'1'},imin={0,'1'}};      % Fugacity Coefficients
-    z = {value={1,'1'},imin={0,'1'},imax={1,'1'}};   % Compressibility
+    z = {value={1,'1'},imin={0,'1'}};                % Compressibility
   end
   
   variables(Balancing = true)
