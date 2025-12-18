@@ -8,7 +8,7 @@ component (Hidden=true) BaseVolume
   % BaseVolume : 1.0 : fixed
   % Base Class for Volumes
   %
-  %   (c) Klaus Schnitzlein - 22.08.2025
+  %   (c) Klaus Schnitzlein - 18.12.2025
 
   inputs(ExternalAccess = none)
     pin = {1,'bar'}; % p
@@ -108,7 +108,7 @@ component (Hidden=true) BaseVolume
     V == sum(Vm.*n); % neu
 
     Port_A.x == x;
-    Port_A.p == pI + if(lt(V,{eps,'l'})), 0 else sum(n.*Mw/V)*(V/A0+h0)*g end;
+    Port_A.p == pI + sum(n.*Mw/(V+{eps,'l'}))*(V/A0+h0)*g;
     Port_A.T == T;
     Port_C.T == T;
     Vout == V;	
