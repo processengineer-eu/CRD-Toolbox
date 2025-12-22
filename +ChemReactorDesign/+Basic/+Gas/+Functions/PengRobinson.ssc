@@ -10,7 +10,7 @@ function EoS_data = PengRobinson(table_zdd,x,p,T,pc,Tc,w,k)
   %       Klaus Schnitzlein - 04.06.2025
 
   % Inputs: alle Größen sind dimensionslos
-  % x   = number of moles of all species (n x 1 column vector) [mol]
+  % x   = mole fractions of all components (n x 1 column vector) 
   % p   = pressure [Pa]
   % T   = temperature [K]
   % pc  = critical pressure of all components (n x 1 column vector)[Pa]

@@ -29,7 +29,7 @@ component (Hidden = true) BaseConvection < BaseTransport
   end
 
   parameters(ExternalAccess = none)
-    ymin = {1.0e-04,'1'}; % Minimum Control Signal
+    ymin = {1.0e-06,'1'}; % Minimum Control Signal
   end
   
   if(flowOutput == OnOff.On)

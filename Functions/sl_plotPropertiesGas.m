@@ -17,8 +17,8 @@ function schema = plot_Gas_H(callbackInfo)
   T = str2num(get_param(gcbh,'table_T'));
   H = str2num(get_param(gcbh,'table_H'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  % species = retrieveSpecies('Gas',Ids);
-  species =Ids;
+  species = retrieveSpecies('Gas',Ids);
+  %species =Ids;
   schema.userdata = {T,H,species,'Enthalpy [kJ/mol]','Gas'};
   schema.callback = @callbackPlot;
 end
@@ -30,8 +30,8 @@ function schema = plot_Gas_G(callbackInfo)
   T = str2num(get_param(gcbh,'table_T'));
   G = str2num(get_param(gcbh,'table_G'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  % species = retrieveSpecies('Gas',Ids);
-  species =Ids;
+  species = retrieveSpecies('Gas',Ids);
+  %species =Ids;
   schema.userdata = {T,G,species,'Gibbs Energy [kJ/mol]','Gas'};
   schema.callback = @callbackPlot;
 end
@@ -55,8 +55,8 @@ function schema = plot_Gas_mu(callbackInfo)
   T = str2num(get_param(gcbh,'table_T'));
   mu = str2num(get_param(gcbh,'table_mu'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  % species = retrieveSpecies('Gas',Ids);
-  species =Ids;
+  species = retrieveSpecies('Gas',Ids);
+  %species =Ids;
   schema.userdata = {T,mu,species,'Dynamic Viscosity [Pa*s]','Gas'};
   schema.callback = @callbackPlot;
 end
@@ -68,8 +68,8 @@ function schema = plot_Gas_lambda(callbackInfo)
   T = str2num(get_param(gcbh,'table_T'));
   lambda = str2num(get_param(gcbh,'table_lambda'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  % species = retrieveSpecies('Gas',Ids);
-  species =Ids;
+  species = retrieveSpecies('Gas',Ids);
+  %species =Ids;
   schema.userdata = {T,lambda,species,'Heat Conductivity [W/(m*K)]','Gas'};
   schema.callback = @callbackPlot;
 end

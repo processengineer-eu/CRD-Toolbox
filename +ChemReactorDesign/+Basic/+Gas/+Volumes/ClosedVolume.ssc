@@ -7,7 +7,7 @@ component ClosedVolume < BaseVolume
   % Closed Volume : 1.5 : fixed
   % Closed Homogeneous Gas Volume
   %
-  %   (c) Klaus Schnitzlein - 19.11.2025
+  %   (c) Klaus Schnitzlein - 19.12.2025
   %
 
   inputs(ExternalAccess = none)
@@ -71,7 +71,6 @@ component ClosedVolume < BaseVolume
 
   equations
     n.der == F;
-    %p.der == z*R/V*(sum(n)*T.der+T*sum(F)); % Annahme: dz/dt = 0 funktioniert nicht !!!
     p == z*R*T/V*sum(n);
     V == if(volumeInputOutput == InOut.Input),
       Vin

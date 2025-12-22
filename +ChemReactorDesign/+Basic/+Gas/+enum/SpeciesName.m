@@ -29,10 +29,11 @@ classdef SpeciesName < int32
     C7H16 (22)
     C6H6 (23)
     C2H4 (24)
-    NO2 (25)
-    N2O4 (26)
-    C2H2 (27)
-    C2H6 (28)
+    NO (25)
+    NO2 (26)
+    N2O4 (27)
+    C2H2 (28)
+    C2H6 (29)
   end
   methods (Static) 
     
@@ -63,6 +64,7 @@ classdef SpeciesName < int32
       map('C7H16') = 'C7H16';
       map('C6H6') = 'C6H6';
       map('C2H4') = 'C2H4';
+      map('NO') = 'NO';
       map('NO2') = 'NO2';
       map('N2O4') = 'N2O4';
       map('C2H2') = 'C2H2';
@@ -96,6 +98,7 @@ classdef SpeciesName < int32
       map('C7H16') = 'N-heptane';
       map('C6H6') = 'Benzene';
       map('C2H4') = 'Ethylene';
+      map('NO') = 'Nitric_oxide';
       map('NO2') = 'Nitrogen_dioxide';
       map('N2O4') = 'Nitrogen_tetroxide';
       map('C2H2') = 'Acetylene';
