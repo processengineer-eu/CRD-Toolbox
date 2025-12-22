@@ -1,0 +1,35 @@
+component PI
+  % PI-Control : 1.0
+  % PI Controller
+  %
+  %   (c) Klaus Schnitzlein - 26.12.2024
+  
+  annotations
+    Icon = './/PI_Control.svg'; 
+    signalType : UnitDropdown = common
+  end
+  
+  outputs
+    y; % y:left
+  end
+  
+  inputs
+    x;  % x:right
+    w;  % w:right
+    y0; % y0:left
+  end
+    
+  parameters
+    Kp = {1,'1'};         % ProportionalitätsfaktorretrieveBlockParameters('modelFlow4','parameters.txt')
+    Tn = {1,'s'};         % Nachstellzeit
+    signalType = {1,'1'}; % Signal Unit
+  end
+  
+  intermediates
+    xw = x-w;
+  end
+
+  equations
+    y == y0-Kp/signalType.*(xw+integ(xw)./Tn);
+  end
+end

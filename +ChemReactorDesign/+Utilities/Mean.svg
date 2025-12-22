@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg  d:options="Background:Transparent;PreserveAspect:On;Resize:FitToBlock;PreAdjustStrokeWidth:Normalized;Frame:Off"
+      version='1.1' xmlns:d="http://www.mathworks.com/blockgraphics"
+      xmlns='http://www.w3.org/2000/svg'
+      xmlns:xlink='http://www.w3.org/1999/xlink'
+      width="100"
+      height="100"
+      viewBox="0 0 100 100" 
+      >
+  <g  d:options="Port:R0">
+    <rect x="0" y="0" width="100" height="100"
+	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;"
+	  fill="none" stroke="black" stroke-width="2" />
+    <rect x="30" y="20" width="20" height="50"
+	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;"
+	  fill="none" stroke="black" stroke-width="2" />
+    <rect x="50" y="30" width="20" height="40"
+	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;"
+	  fill="none" stroke="black" stroke-width="2" />
+	      
+   </g>
+</svg>

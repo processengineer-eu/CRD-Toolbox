@@ -1,0 +1,60 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+
+component DelayedSwitch
+% Switch with Hysteresis
+
+  inputs
+    x;  % x
+  end
+
+  outputs
+    y;  % y
+  end
+
+  annotations
+    [threshold,xsmall] : UnitDropdown = common
+    x : Side = left;
+    y : Side = right;
+  end
+
+  if(mode == OnOff.Off)
+    annotations
+      Icon = './SigmoidOn.svg';
+    end
+  else
+    annotations
+      Icon = './SigmoidOff.svg';
+    end
+  end
+
+  parameters
+    threshold = {1,'1'}; % Threshold (c)
+    mode = OnOff.On; % Condition: on(x>c) - off(x<c)
+    xsmall = {1.0e-03,'1'};
+  end
+  
+  modecharts(ExternalAccess = observe)
+    m1 = modechart
+      modes
+        mode CLOSED
+          equations
+            y == 0;
+          end
+        end
+        mode OPEN
+          equations
+            y == 1;
+          end
+        end
+      end
+      transitions
+        CLOSED -> OPEN : gt(x,threshold+xsmall);
+        OPEN -> CLOSED : lt(x,threshold-xsmall);
+      end
+      initial
+        OPEN : mode == OnOff.Off;
+      end
+    end
+  end
+end

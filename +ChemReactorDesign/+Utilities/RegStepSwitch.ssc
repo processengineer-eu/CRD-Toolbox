@@ -1,0 +1,49 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+
+component RegStepSwitch
+  % RegStepSwitch : 1.5
+  % Continuous Approximation of a Discrete Signal
+  %
+  %   (c) Klaus Schnitzlein - 21.02.2025
+  
+  parameters
+    threshold = {1,'1'}; % Threshold (c)
+    mode = OnOff.On; % Condition: on(x>c) - off(x<c)
+    xsmall = {1.0e-03,'1'}; % Approximation Limit
+  end
+
+  inputs
+    x;  % x
+  end
+
+  outputs
+    y;  % y
+  end
+  
+  if(mode == OnOff.Off)
+    annotations
+      Icon = './SigmoidOn.svg';
+    end
+  else
+    annotations
+      Icon = './SigmoidOff.svg';
+    end
+  end
+
+  annotations
+    [threshold,xsmall] : UnitDropdown = common
+    x : Side = left;
+    y : Side = right;
+  end
+  
+  equations
+    y == if(mode == OnOff.Off),
+      regStep(x-threshold,0,1,xsmall)
+    else
+      regStep(x-threshold,1,0,xsmall)
+    end;
+  end
+end
+
+ 

@@ -1,0 +1,49 @@
+import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
+
+component SigmoidSwitch
+  % SigmoidSwitch : 1.5
+  % Continuous Approximation of a Discrete Signal
+  %
+  %   (c) Klaus Schnitzlein - 12.09.2025
+  
+  parameters
+    threshold = {1,'1'};    % Threshold (c)
+    xsmall = {1.0e-03,'1'}; % Approximation Limit
+    mode = OnOff.On;        % Condition: on(x>c) - off(x<c)
+  end
+
+  inputs
+    x;  % x
+  end
+
+  outputs
+    y;  % y
+  end
+  
+  if(mode == OnOff.Off)
+    annotations
+      Icon = './SigmoidOn.svg';
+    end
+  else
+    annotations
+      Icon = './SigmoidOff.svg';
+    end
+  end
+
+  annotations
+    [threshold,xsmall] : UnitDropdown = common
+    x : Side = left;
+    y : Side = right;
+  end
+  
+  equations
+    y == if(mode == OnOff.Off),
+      1-Sigmoid(x,threshold,xsmall)
+    else
+      Sigmoid(x,threshold,xsmall)
+    end;
+  end
+end
+
+ 

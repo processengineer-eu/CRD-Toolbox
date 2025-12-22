@@ -1,0 +1,36 @@
+component Switch
+  % Triggered Switch : 0.5
+  %
+  %   (c) Klaus Schnitzlein - 30.12.2024
+  
+  annotations
+    Icon = './Switch.svg';
+    [output1,output2] : Side = right;
+    input : Side = left;
+    trigger : Side = top;
+  end
+  
+  outputs
+    output1; %
+    output2; % 
+  end
+  
+  inputs
+    input; %
+    trigger; % 
+  end
+    
+  parameters
+    threshold = {1,'1'};     % Threshold   
+  end
+  
+  equations
+    if(le(trigger,threshold))
+      output1 == input;
+      output2 == 0;
+    else
+      output1 == 0;
+      output2 == input;
+    end
+  end
+end

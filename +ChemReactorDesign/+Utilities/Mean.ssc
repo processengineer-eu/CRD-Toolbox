@@ -1,0 +1,45 @@
+component Mean
+  % Mean Value : 0.5
+  %
+  %   (c) Klaus Schnitzlein - 30.12.2024
+  
+  annotations
+    Icon = './Mean.svg';
+    [output] : Side = bottom;
+    input1 : Side = left;
+    input2 : Side = right;
+  end
+  
+  outputs
+    output; % 
+  end
+  
+  inputs
+    input1; % 
+    input2; % 
+    end
+
+  parameters
+    select = ChemReactorDesign.Basic.enum.Mean.Average; % Select Algorithm
+  end
+
+  parameters(ExternalAccess = none)
+    f = {0.5,'1'}; % Relative Distance
+  end
+
+  if(select == ChemReactorDesign.Basic.enum.Mean.Harmonic)
+    annotations
+      f : ExternalAccess = modify;
+    end
+  end
+
+  equations
+    output == if(select == ChemReactorDesign.Basic.enum.Mean.Average)
+      0.5*(input1+input2)
+    else %ifselect == ChemReactorDesign.Basic.enum.Harmonic)
+      1/((1-f)/input1+f/input2)
+    end
+  end
+
+end
+
