@@ -11,7 +11,7 @@ component Ergun < ConvectionP(...
   % Ergun : 1.5
   % Convective Mass and Heat Transport in a Porous Medium
   %
-  %   (c) Klaus Schnitzlein - 08.07.2025
+  %   (c) Klaus Schnitzlein - 26.12.2025
    
   inputs(ExternalAccess = none)
     epsbIn = {1,'1'}; % e
@@ -21,7 +21,7 @@ component Ergun < ConvectionP(...
     Icon = './Ergun.svg';
     epsbIn : Side = top;
     [b0,b1,controlInput,checkValve] : ExternalAccess = none;
-    delta : ExternalAccess = modify;
+    [A0,delta] : ExternalAccess = modify;
     UILayout = [...
       UIGroup('Options',porosityInput,areaInput,flowOutput),...
       UIGroup('Geometry',A0,delta),...

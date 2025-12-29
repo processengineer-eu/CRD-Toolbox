@@ -105,10 +105,10 @@ component (Hidden=true) BaseVolume
 
   equations
     n.der == F;
-    V == sum(Vm.*n); % neu
+    V == sum(Vm.*n);
 
     Port_A.x == x;
-    Port_A.p == pI + sum(n.*Mw/(V+{eps,'l'}))*(V/A0+h0)*g;
+    Port_A.p == pI + sum(n.*Mw/(V+{eps,'l'}))*(V/A0+h0)*g; 
     Port_A.T == T;
     Port_C.T == T;
     Vout == V;	

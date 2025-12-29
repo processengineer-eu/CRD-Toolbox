@@ -9,12 +9,12 @@ component Valve < ConvectionP(...
   % Valve : 1.5
   % Convective Mass Transport through a Valve
   %
-  %   (c) Klaus Schnitzlein - 08.07.2025
+  %   (c) Klaus Schnitzlein - 28.12.2025
   
   annotations
     Icon = './Valve.svg';
     delta : ExternalAccess = none;
-    controlInput : ExternalAccess = none;
+    [b0,b1,controlInput] : ExternalAccess = none;
     UILayout = [...
       UIGroup('Options',areaInput,flowOutput,checkValve),...
       UIGroup('Geometry',A0),....

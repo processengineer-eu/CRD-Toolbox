@@ -1,4 +1,5 @@
 import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
 import ChemReactorDesign.Basic.Gas.enum.*;
 import ChemReactorDesign.Basic.Gas.Functions.*;
 import ChemReactorDesign.Basic.Gas.Volumes.*;
@@ -73,7 +74,7 @@ component ClosedVolume < BaseVolume
     n.der == F;
     p == z*R*T/V*sum(n);
     V == if(volumeInputOutput == InOut.Input),
-      Vin
+      max_noZC(Vin,{eps,'l'})
     else
       V0
     end;

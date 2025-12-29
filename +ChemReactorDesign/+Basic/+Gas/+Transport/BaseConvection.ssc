@@ -7,7 +7,7 @@ component (Hidden = true) BaseConvection < BaseTransport
   % Base Class for Convective Mass and Heat Transport
   %   - with Upstream Conditions
   %
-  %   (c) Klaus Schnitzlein - 08.07.2025
+  %   (c) Klaus Schnitzlein - 26.12.2025
 
   inputs(ExternalAccess = none)
     yin = {0,'1'}; % y
@@ -30,6 +30,7 @@ component (Hidden = true) BaseConvection < BaseTransport
 
   parameters(ExternalAccess = none)
     ymin = {1.0e-06,'1'}; % Minimum Control Signal
+    threshold = {1,'Pa'}; % Pressure Threshold for Hysteresis
   end
   
   if(flowOutput == OnOff.On)
@@ -47,13 +48,13 @@ component (Hidden = true) BaseConvection < BaseTransport
   intermediates
     muA = getProperty_T(Port_A.table_T,Port_A.table_mu,TA);
     muB = getProperty_T(Port_A.table_T,Port_A.table_mu,TB);
-    deltap = if(checkValve == OnOff.On),
-      if(gt(pA,pB)), pA-pB else 0 end;
+    deltap = if(checkValve == OnOff.On),  
+      if(gt(pA,pB)), pA-pB else {eps,'bar'} end;
     else
       pA-pB;
     end;
     y = if(controlInput == OnOff.On),
-      max_noZC(ymin,min_noZC(yin,1)); % die Schranke sollte nicht kleiner sein als AbsTol
+      max_noZC(ymin,min_noZC(yin,1)); 
     else
       1;
     end;

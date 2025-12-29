@@ -4,14 +4,13 @@ import ChemReactorDesign.Basic.Liquid.Functions.*;
 import ChemReactorDesign.Basic.Liquid.Transport.*;
 
 component Ergun < ConvectionP(...
-    controlInput = OnOff.Off,...
     checkValve = OnOff.Off,...
     beta0 = 150*mu*(1-por)^2/(por^3*dp^2)*delta/A,...
     beta1 = 1.75*rho*(1-por)/(por^3*dp)*delta/A^2)
   % Ergun : 1.5
   % Convective Mass Transport in a Porous Medium
   %
-  %   (c) Klaus Schnitzlein - 08.07.2025
+  %   (c) Klaus Schnitzlein - 29.12.2025
    
   inputs(ExternalAccess = none)
     epsbIn = {1,'1'}; % e
@@ -20,20 +19,21 @@ component Ergun < ConvectionP(...
   annotations
     Icon = './Ergun.svg';
     epsbIn : Side = top;
-    [controlInput,checkValve] : ExternalAccess = none;
+    [b0,b1,checkValve] : ExternalAccess = none;
+    [A0,delta] : ExternalAccess = modify;
     UILayout = [...
-      UIGroup('Options',inputPorosity,areaInput,flowOutput),...
+      UIGroup('Options',porosityInput,areaInput,flowOutput,controlInput),...
       UIGroup('Geometry',A0,delta),...
       UIGroup('MassTransport',epsb,dp)];
   end
   
   parameters
-    inputPorosity = OnOff.Off; % Porosity Input
+    porosityInput = OnOff.Off; % Porosity Input
     epsb = {1,'1'};  % Voidage Fraction
     dp = {1.0e-06,'m'};  % Particle Diameter
   end
   
-  if(inputPorosity == OnOff.On)
+  if(porosityInput == OnOff.On)
     annotations
       epsbIn : ExternalAccess = modify;
       epsb : ExternalAccess = none;
@@ -41,8 +41,8 @@ component Ergun < ConvectionP(...
   end
 
   intermediates
-    por = if(inputPorosity == OnOff.On), 
-      epsbIn 
+    por = if(porosityInput == OnOff.On), 
+      max_noZC(epsbIn,eps) 
     else 
       epsb 
     end;
