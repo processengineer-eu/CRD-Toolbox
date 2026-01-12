@@ -1,3 +1,5 @@
+-
++ import ChemReactorDesign.Basic.enum.*;
 import ChemReactorDesign.Basic.Functions.*;
 import ChemReactorDesign.Basic.Gas.Transport.*;
 import ChemReactorDesign.Basic.Gas.Functions.*;
@@ -6,27 +8,47 @@ component ViscousFlow < BaseDiffusion
   % Viscous Flow : 1.5
   % Convective Mass and Heat Transport due to Viscous Flow 
   %
-  %   (c) Klaus Schnitzlein - 31.01.2025
+  %   (c) Klaus Schnitzlein - 09.01.2026
    
+  inputs(ExternalAccess = none)
+    epspIn = {1,'1'}; % e
+  end
+
   annotations
     Icon = './ViscousFlow.svg';
+    epspIn : Side = top;
     UILayout = [...
-      UIGroup('Options',areaInput),...
+      UIGroup('Options',areaInput,porosityInput),...
       UIGroup('Geometry',A0,delta),....
-      UIGroup('MassTransport',B0)];
+      UIGroup('MassTransport',B0,epsp,tau)];
   end
 
   parameters
-    B0 = {1.0e-06,'m^2'};      % Permeability
+    porosityInput = OnOff.Off;   % Porosity Input
+    epsp = {1,'1'};              % Voidage Fraction
+    tau  = {1,'1'};              % Tortuosity Factor
+    B0 = {1.0e-06,'m^2'};        % Permeability
+  end
+
+  if(porosityInput == OnOff.On)
+    annotations
+      epspIn : ExternalAccess = modify;
+      epsp : ExternalAccess = none;
+    end
   end
 
   intermediates
     mu = getProperty_T(Port_A.table_T,Port_A.table_mu,T);
     mum = getMixtureMu(Port_A.Mw,x,mu);
+    por = if(porosityInput == OnOff.On), 
+      max_noZC(epspIn,eps); 
+    else 
+      epsp 
+    end;
   end
 
   equations
-    J == -x*B0*p/(mum*R*T)*gradp;
+    J == -x*(epsp/tau)*B0*p/(mum*R*T)*gradp;
   end
   
 end
