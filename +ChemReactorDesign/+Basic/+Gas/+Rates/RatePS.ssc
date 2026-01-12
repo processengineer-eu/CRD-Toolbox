@@ -9,7 +9,7 @@ component RatePS < BaseRate
   % RatePS : 1.5
   % Heterogeneous (Gas-Solid) Power Law Reaction Rate 
   %
-  %  (c) Klaus Schnitzlein - 10.10.2025
+  %  (c) Klaus Schnitzlein - 09.01.2026
 
   nodes
     Port_B_S = Solid;  %
@@ -49,16 +49,22 @@ component RatePS < BaseRate
     x_S = checkMoleFractions(Port_B_S.x); 
     lambdaf_S = (sum(1*(lt(row_nu_S,0) & le(x_S,eps)))==0);
     lambdab_S = (sum(1*(gt(row_nu_S,0) & le(x_S,eps)))==0); 
+    G_S = getProperty_T(Port_B_S.table_T,Port_B_S.table_G,T);
+    Ka_S = if(reversibility == Reversibility.Reversible && ...
+        calculate_Ka == simscape.enum.onoff.on)
+      exp(-(dGr + sum(row_nu_S.*G_S))/(Port_B.R*T))
+    else
+      Ka0
+    end;
   end
 
   equations
-    r == kf*(lambdaf_S*prodf-lambdab_S*prodb/Ka);
+    r == kf*(lambdaf_S*prodf-lambdab_S*prodb/Ka_S);
   end
 
   equations
     F_S == row_nu_S*r;
     Phi_S == 0;
-
     assert(length(nu_S) == N_S);
   end
 end
