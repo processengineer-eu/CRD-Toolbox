@@ -45,7 +45,7 @@ Mw = simscape.Value(zeros(N,1),'g/mol');
 dHf0 = simscape.Value(zeros(N,1),'kJ/mol');
 dSf0 = simscape.Value(zeros(N,1),'kJ/(mol*K)');
 dGf0 = simscape.Value(zeros(N,1),'kJ/mol');
-S0 = simscape.Value(zeros(N,1),'kJ/(mol*K)');
+% S0 = simscape.Value(zeros(N,1),'kJ/(mol*K)');
 
 % Koeffizienten sind dimensionslos, da sie #eqno und #mult enthalten
 cp0 = zeros(N,7);
@@ -85,8 +85,8 @@ for i=1:length(Ids)
   dGf0(i) = simscape.Value(data.GibbsEnergyOfFormation.valueAttribute,...
     data.GibbsEnergyOfFormation.unitsAttribute);
   dSf0(i) = (dHf0(i)-dGf0(i))/Tref;
-  S0(i) =  simscape.Value(data.AbsEntropy.valueAttribute,...
-    data.AbsEntropy.unitsAttribute);
+  % S0(i) =  simscape.Value(data.AbsEntropy.valueAttribute,...
+  %   data.AbsEntropy.unitsAttribute);
         
   lambda0(i,1) = data.SolidThermalConductivity.eqno.valueAttribute;
   lambda0(i,2) = simscape.Value(1,data.SolidThermalConductivity.unitsAttribute)/...

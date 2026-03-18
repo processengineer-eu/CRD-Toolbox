@@ -7,7 +7,7 @@ import ChemReactorDesign.Basic.Liquid.Functions.*;
 import ChemReactorDesign.Basic.Gas.*;
 
 component GLE
-	% GLE: 1.5 : fixed
+	% GLE: 1.5 
   % Gas-Liquid Equilibrium - Dissolution of a Gas in a Liquid Mixture
   %
   %   (c) Klaus Schnitzlein - 10.10.2025
@@ -17,7 +17,7 @@ component GLE
   end
 
   inputs(ExternalAccess = none)
-    Ain = {0,'m^2'}; % S
+    Ain = {0,'m^2'}; % A
   end
 
   annotations

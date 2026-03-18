@@ -96,4 +96,11 @@ Examples can be found in the respective folder.
 
 [Reference Manual](https://oocrd.processengineer.eu/Main.html)
 
+## Aknowledgements
+Thanks to 
+- the team of MathWorks, i.e. Aycan Hacioglu, Erin McGarrin, Steven Xu
+  and others, for their support.
+- to Jesus Christ, my Lord and Saviour for giving me the wisdom, power
+  and endurance to work on this project for almost one decade.
+
 

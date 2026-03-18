@@ -3,6 +3,7 @@ import ChemReactorDesign.Basic.enum.*;
 
 component SensorThrough
   % Through Sensor : 1.0 : fixed
+  % Sensor for Through Variables
   %
   %   (c) Klaus Schnitzlein - 11.06.2025
   

@@ -8,7 +8,7 @@ component (Hidden=true) BaseVolume
   % BaseVolume : 1.0 : fixed
   % Base Class for Volumes
   %
-  %   (c) Klaus Schnitzlein - 05.08.2025
+  %   (c) Klaus Schnitzlein - 17.02.2026
 
   outputs(ExternalAccess = none)
     Vout = {0,'l'}; % V
@@ -19,8 +19,13 @@ component (Hidden=true) BaseVolume
     Port_C = foundation.thermal.thermal;  %
   end
 
+  nodes(ExternalAccess = none)
+    Port_B = Gas; %
+  end
+
   annotations
     Port_A : Side = left;
+    Port_B : Side = right;
     Port_C : Side = bottom;
     Vout : Side = top;
     H : LoggingUnit = 'kJ/mol';
@@ -29,6 +34,7 @@ component (Hidden=true) BaseVolume
   parameters
     isothermalOperation = OnOff.On;  % Isothermal Operation
     compressionWork = OnOff.On;      % Compression Work
+    enable2ndPort = OnOff.Off;       % Enable 2nd Port
     V0 = {1,'l'};          % Volume
     x0 = {[0;1],'1'};      % Initial Mole Fractions
     p0 = {1.0,'bar'};      % Initial Pressure
@@ -46,6 +52,12 @@ component (Hidden=true) BaseVolume
       Port_C : ExternalAccess = none;
     end
   end  
+
+  if(enable2ndPort == OnOff.On)
+    annotations
+      Port_B : ExternalAccess = modify;
+    end
+  end
 
   variables(Access = protected)
     F = {value = {zeros(N,1),'mol/s'},nominal = Port_A.F_nom};
@@ -78,6 +90,10 @@ component (Hidden=true) BaseVolume
       'invalid mole fractions -> sum(x(i)) != 1');
     assert(sum(1*(x0<0)) == 0,...
       'invalid mole fractions -> x(i) < 0'); 
+  end
+
+  connections
+    connect(Port_A,Port_B);
   end
 
 end

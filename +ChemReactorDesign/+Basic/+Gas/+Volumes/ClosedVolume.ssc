@@ -8,7 +8,7 @@ component ClosedVolume < BaseVolume
   % Closed Volume : 1.5 : fixed
   % Closed Homogeneous Gas Volume
   %
-  %   (c) Klaus Schnitzlein - 19.12.2025
+  %   (c) Klaus Schnitzlein - 17.02.2026
   %
 
   inputs(ExternalAccess = none)
@@ -19,14 +19,17 @@ component ClosedVolume < BaseVolume
     Vin : Side = top;
     Icon = './Volume.svg';
     UILayout = [...
-      UIGroup('Options',volumeInputOutput,isothermalOperation,compressionWork),...
+      UIGroup('Options',volumeInputOutput,isothermalOperation,compressionWork,enable2ndPort),...
       UIGroup('Geometry',V0),...
-      UIGroup('OperatingConditions',x0,p0,T0)];
+      UIGroup('OperatingConditions',x0,p0,T0),...
+      UIGroup('NominalValues',n_nom)]; % V_nom
     n : LoggingUnit = 'mol';
   end
 
   parameters
     volumeInputOutput = InOut.Off; % Volume Input/Output
+    % V_nom = {1,'l'};   % Nominal Value for Volume
+    n_nom = {1,'mol'}; % Nominal Value for Number of Moles
   end
  
   parameters(Access = protected)
@@ -45,9 +48,9 @@ component ClosedVolume < BaseVolume
   end
 
   variables(Access = protected)
-    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n0};
+    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n_nom};
     p = {value = p0,priority = priority.high};
-    V = {value = V0,nominal = V0};
+    % V = {value = V0,nominal = V_nom};
   end
 
   equations(Initial = true)
@@ -62,6 +65,7 @@ component ClosedVolume < BaseVolume
     if(compressionWork == OnOff.On)
       equations
         sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q + V*p.der;
+        % sum(F.*(H-R/z*T)) + sum(F)*Hres + sum(n.*(cp-R/z))*T.der == Phi + Q; % explizite Formulierung
       end
     else
       equations
@@ -70,15 +74,24 @@ component ClosedVolume < BaseVolume
     end
   end
 
+  intermediates
+    V =if(volumeInputOutput == InOut.Input),
+      max_noZC(Vin,{eps,'l'})
+    else
+      V0;
+    end;
+  end
+
   equations
     n.der == F;
     p == z*R*T/V*sum(n);
-    V == if(volumeInputOutput == InOut.Input),
-      max_noZC(Vin,{eps,'l'})
-    else
-      V0
-    end;
-    
+
+    % und wenn ich V als intermediate definiere??
+    % V == if(volumeInputOutput == InOut.Input),
+    %   max_noZC(Vin,{eps,'l'})
+    % else
+    %   V0;
+    % end;
     Vout == V;
     Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
     Port_A.p == p;

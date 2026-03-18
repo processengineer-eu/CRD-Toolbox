@@ -1,7 +1,7 @@
 function val = getProperty_T(eqno,p,Tc,T)
 
 % Calculation of temperature dependent property
-% (c) Klaus Schnitzlein - 10.09.2025
+% (c) Klaus Schnitzlein - 11.01.2026
 
 % Achtung: noch nicht alle Gleichungen sind auf vektorielle Berechnung
 % angepaßt
@@ -20,6 +20,8 @@ switch eqno
     val = p(1)+p(2)*T+p(3)*T.^2+p(4)*T.^3;
   case 5
     val = p(1)+p(2)*T+p(3)*T.^2+p(4)*T.^3+p(5)*T.^4;
+  case 6 % NIST
+    val = p(1)+p(2)*(T/1000)+p(3)*(T/1000).^2+p(4)*(T/1000).^3+p(5)./(T/1000).^2;
   case 10
     val = exp(p(1)-p(2)./(p(3)+T));
   case 11
@@ -39,7 +41,7 @@ switch eqno
   case 45
     val = p(1)*T+p(2)*T.^2/2+p(3)*T.^3/3+p(4)*T.^4/4+p(5)*T.^5/5;
   case 75
-    val = p(2)+2*p(3).*T+3*p(4)*T.^2+4*p(5)^3;
+    val = p(2)+2*p(3).*T+3*p(4)*T.^2+4*p(5).T^3;
   case 100
     val = p(1)+p(2)*T+p(3)*T.^2+p(4)*T.^3+p(5)*T.^4;
   case 101
@@ -60,7 +62,7 @@ switch eqno
     val = p(1)^2*(1-Tr)+p(2)-2*p(1)*p(3)*(1-Tr)-p(1)*p(4)*(1-Tr)^2-...
       p(3)^2*(1-Tr)^3/3-p(3)*p(4)*(1-Tr)^4/2-p(4)^2*(1-Tr)^5/5;
   case 115
-    val = exp(p(1)+p(2)/T+p(3)*log(T)+p(4)*T^2+p(4)*T^2);
+    val = exp(p(1)+p(2)/T+p(3)*log(T)+p(4)*T^2+p(5)*T^3); % falsch
   case 116
     val = p(1)+p(2)*(1-Tr)^0.35+p(3)*(1-Tr)^2/3+p(4)*(1-Tr)+p(5)*(1-Tr)^4/3;
   case 117

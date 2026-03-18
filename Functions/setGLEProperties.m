@@ -2,7 +2,7 @@ function setGLEProperties(table_T,model,species,block)
 
 % Set Properties for Gas Dissolution 
 %
-% (c) Klaus Schnitzlein - 07.10.2025
+% (c) Klaus Schnitzlein - 23.02.2026
 
 species = strrep(species,'(g)',''); % strip '(s)' if present
 N = length(species);
@@ -26,7 +26,9 @@ nT = length(table_T);
 table_Henry = simscape.Value(zeros(nT,N),'bar');
 
 for i=1:nT
-  table_Henry(i,:) = simscape.Value(10.^(A+B/table_T(i)+C*log10(value(table_T(i),'K'))+D*table_T(i)),'bar')';
+  Tval = value(table_T(i),'K');
+  val = A+B/table_T(i)+C*log10(Tval)+D*table_T(i);
+  table_Henry(i,:) = simscape.Value(10.^(val)','bar');
 end
 table_dHs = repmat(dHs',nT,1);
 

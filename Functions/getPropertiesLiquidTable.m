@@ -185,7 +185,7 @@ table_Hv = simscape.Value(zeros(N,np),'kJ/mol');
 
 S0Liquid = simscape.Value(zeros(N,1),'kJ/(mol*K)');
 for i=1:N
-  S0Liquid(i) = getHv(Hv0(i,:),value(Tc(i),'K'),value(Tb(i),'K'))./(Tb(i)+simscape.Value(eps,'K'));
+  S0Liquid(i) = getHv(Hv0(i,:),value(Tc(i),'K'),value(Tb(i),'K'))./(Tb(i)+simscape.Value(eps,'K')); 
 end
 
 for k=1:np
@@ -196,7 +196,7 @@ for k=1:np
   table_S(:,k) = getS(dSf0,cp0,value(Tc,'K'),value(table_T(k),'K'))-S0Liquid; 
   for i=1:N
     if(charge(i) ~= 0)
-      table_G(i,k) = dGf0(i)-S0(i)*(table_T(k)-Tref);
+      table_G(i,k) = dGf0(i)-S0(i)*(table_T(k)-Tref); % Spezialbehandlung Elektrolyte
     else
       table_G(i,k) = table_H(i,k)-table_T(k)*table_S(i,k);
     end

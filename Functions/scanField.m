@@ -1,4 +1,4 @@
-% Retrieving valueAttriutes for Data Set
+% Retrieving valueAttributes for Data Set
 %
 % (c) Klaus Schnitzlein - 17.04.2025
 

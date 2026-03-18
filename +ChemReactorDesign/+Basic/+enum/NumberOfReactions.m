@@ -9,7 +9,7 @@ classdef NumberOfReactions < int32
 	    map = containers.Map;
             map('one') = '1';
             map('two') = '2';
-	    map('three') = '3';
+      	    map('three') = '3';
         end
 end
 end

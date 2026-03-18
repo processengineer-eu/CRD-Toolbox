@@ -7,7 +7,7 @@ component PorousVolume < BaseVolume
  % Porous Volume : 1.5 : fixed
  % Closed Heterogeneous Gas Volume
  %
- %   (c) Klaus Schnitzlein - 19.11.2025
+ %   (c) Klaus Schnitzlein - 13.02.2026
  % 
 
  inputs(ExternalAccess = none)
@@ -23,10 +23,11 @@ component PorousVolume < BaseVolume
    mout : Side = top;
    Icon = './PorousVolume.svg';
    UILayout = [...
-     UIGroup('Options',volumeInputOutput,massOutput,isothermalOperation,compressionWork),...
+     UIGroup('Options',volumeInputOutput,massOutput,isothermalOperation,compressionWork,enable2ndPort),...
      UIGroup('Geometry',V0),...
      UIGroup('Solid',epsb,cps,rhos),...
-     UIGroup('OperatingConditions',x0,p0,T0)];
+     UIGroup('OperatingConditions',x0,p0,T0),...
+     UIGroup('NominalValues',n_nom)]; %V_nom
    n : LoggingUnit = 'mol';
  end
 
@@ -36,6 +37,8 @@ component PorousVolume < BaseVolume
    epsb = {1,'1'};                % Void Fraction
    cps = {1,'kJ/(kg*K)'};         % Solid Specific Heat
    rhos = {1.0e+03,'kg/m^3'};     % Solid Density
+   % V_nom = {1,'l'};   % Nominal Value for Volume
+   n_nom = {1,'mol'}; % Nominal Value for Number of Moles
  end
 
  parameters(Access = protected)
@@ -60,9 +63,9 @@ component PorousVolume < BaseVolume
   end
 
   variables(Access = protected)
-    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n0};
+    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n_nom};
     p = {value = p0,priority = priority.high};
-    V = {value = V0,nominal = V0};
+    % V = {value = V0,nominal = V_nom};
   end
  
   equations(Initial = true)
@@ -85,15 +88,23 @@ component PorousVolume < BaseVolume
     end
   end
 
-  equations
-    n.der == F;
-    % p.der == z*R/(epsb*V)*(sum(n)*T.der+T*sum(F)); % Annahme: dz/dt = 0 funktioniert nicht
-    p == z*R*T/(epsb*V)*sum(n);
-    V == if(volumeInputOutput == InOut.Input),
+  intermediates
+    V = if(volumeInputOutput == InOut.Input),
       Vin
     else
       V0
     end;
+  end
+
+  equations
+    n.der == F;
+    % p.der == z*R/(epsb*V)*(sum(n)*T.der+T*sum(F)); % Annahme: dz/dt = 0 funktioniert nicht
+    p == z*R*T/(epsb*V)*sum(n);
+    % V == if(volumeInputOutput == InOut.Input),
+    %   Vin
+    % else
+    %   V0
+    % end;
     
     Vout == V;
     mout == (1-epsb)*V*rhos;

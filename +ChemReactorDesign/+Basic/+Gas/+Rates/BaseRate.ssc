@@ -6,7 +6,7 @@ import ChemReactorDesign.Basic.Gas.enum.*;
 component (Hidden = true) BaseRate
   % Base Class for Gas Rates
   %
-  %   (c) Klaus Schnitzlein - 17.11.2025
+  %   (c) Klaus Schnitzlein - 14.01.2026
    
   inputs(ExternalAccess = none)
     V = {0,'l'};    % V
@@ -113,7 +113,7 @@ component (Hidden = true) BaseRate
       kfinf*exp(-Ea/(R*T))
     end;
     x = [Port_B.x;1-sum(Port_B.x)];
-    a = max_noZC(phi.*x*p/{1,'bar'},eps); 
+    a = max_noZC(phi.*x*p/{1,'bar'},eps);
     
     kfinf = if(rateReference == ChemReactorDesign.Basic.enum.RateReference.Volume),
       kfinfV*V
@@ -134,7 +134,7 @@ component (Hidden = true) BaseRate
     end;
 
     prodf = prod(a.^row_kappaf);
-    lambdaf = (eq(sum(1*(eq(row_kappaf,0) & lt(row_nu,0) & le(a,eps))),0)); % neu neu 
+    lambdaf = (eq(sum(1*(eq(row_kappaf,0) & lt(row_nu,0) & le(a,0))),0)); % neu neu neu
     prodb = if(reversibility == Reversibility.Irreversible),
       1
     else
@@ -143,7 +143,7 @@ component (Hidden = true) BaseRate
     lambdab = if(reversibility == Reversibility.Irreversible),
       1
     else
-      (eq(sum(1*(eq(row_kappab,0) & gt(row_nu,0) & le(a,eps))),0)); % neu neu
+      (eq(sum(1*(eq(row_kappab,0) & gt(row_nu,0) & le(a,0))),0)); % neu neu neu
     end
   end
 

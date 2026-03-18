@@ -4,6 +4,7 @@ import ChemReactorDesign.Basic.Functions.*;
 
 component SensorAcross
   % Across Sensor : 1.0 : fixed
+  % Sensor for Across Variables
   %
   %   (c) Klaus Schnitzlein - 28.05.2025
 

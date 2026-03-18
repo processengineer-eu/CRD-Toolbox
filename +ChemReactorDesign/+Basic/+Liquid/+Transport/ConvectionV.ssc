@@ -6,7 +6,7 @@ component ConvectionV < BaseConvection
   % Velocity Induced Convective Mass and 
   %   - with Upstream Conditions
   %
-  %   (c) Klaus Schnitzlein - 08.08.2025
+  %   (c) Klaus Schnitzlein - 19.02.2026
 
   inputs(ExternalAccess = none)
     qin = {0,'l/s'}; % q
@@ -31,8 +31,14 @@ component ConvectionV < BaseConvection
       q0 : ExternalAccess = none;
       qin : ExternalAccess = modify;
     end
-    equations
-      q == qin;
+    if(controlInput == OnOff.On)
+      equations
+        q == y*qin;
+      end
+    else
+      equations
+        q == qin;
+      end
     end
   else
     if(controlInput == OnOff.On)

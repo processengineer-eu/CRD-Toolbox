@@ -31,7 +31,7 @@ component Conduction
     lambdaInput = OnOff.Off;         % Lambda Input
     A0 = {1,'m^2'};                  % Cross Sectional Area
     delta  = {1.0e-03,'m'};          % Transport Distance
-    lambda0 = {1.0e-04,'W/(m*K)'};    % Heat Conductivity
+    lambda0 = {1.0e-04,'W/(m*K)'};   % Heat Conductivity
   end
 
   if(areaInput ==OnOff.On)

@@ -175,6 +175,7 @@ fprintf(fp,'\t\tfunction map = displayText()\n');
 fprintf(fp,'\t\t\tmap = containers.Map;\n');
 for i=1:N
   fprintf(fp,sprintf('\t\t\tmap(''S%d'') = ''%s'';\n',i,gasSpecies{i}));
+  % fprintf(fp,sprintf('\t\t\tmap(''S%d'') = ''%s'';\n',i,fileNames{i}));
 end
 fprintf(fp,'\t\tend\n');
 fprintf(fp,'\tend\n');

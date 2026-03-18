@@ -1,4 +1,5 @@
 import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
 import ChemReactorDesign.Basic.Gas.enum.*;
 import ChemReactorDesign.Basic.Gas.Functions.*;
 
@@ -6,29 +7,36 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
   % Balloon : 1.5 : fixed
   % Variable Homogeneous Gas Volume 
   %
-  %   (c) Klaus Schnitzlein - 09.12.2025
+  %   (c) Klaus Schnitzlein - 10.03.2026
   
   inputs(ExternalAccess = none)
+    Vmax_in = {1,'l'}; % Va
     pin = {0,'bar'}; % p
   end
 
   annotations
-    pin : Side = top;
+    [Vmax_in,pin] : Side = top;
     Icon = './Balloon.svg';
     UILayout = [...
-      UIGroup('Options',pressureInput,volumeOutput,compressionWork,isothermalOperation),...
-      UIGroup('Geometry',V0),...
-      UIGroup('OperatingConditions',x0,p0,T0)];
+      UIGroup('Options',pressureInput,VmaxInput,volumeOutput,compressionWork,isothermalOperation,enable2ndPort),...
+      UIGroup('Geometry',V0,Vmax0),...
+      UIGroup('OperatingConditions',x0,p0,T0),...
+      UIGroup('NominalValues',n_nom,V_nom)];
     n : LoggingUnit = 'mol';
   end
 
   parameters
     volumeOutput = OnOff.Off; % Volume Output
+    VmaxInput = OnOff.Off; % Maximum Volume Input
     pressureInput = OnOff.Off; % Pressure Input
-  end
+    Vmax0 = {1,'l'};   % Maximum Volume
+    V_nom = {1,'l'};   % Nominal Value for Volume
+    n_nom = {1,'mol'}; % Nominal Value for Number of Moles
+ end
 
   parameters(Access = protected)
     n0 = p0*V0/(Port_A.R*T0);
+    k = {1.0e-04,'1'}; % Factor for hard stop of volume
   end
 
   if(volumeOutput == OnOff.On)
@@ -44,10 +52,17 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
     end  
   end
 
+  if(VmaxInput == OnOff.On)
+    annotations
+      Vmax0 : ExternalAccess = none;
+      Vmax_in : ExternalAccess = modify;
+    end
+  end
+
   variables(Access = protected)
-    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n0};
-    V = {value = V0,nominal = V0,priority = priority.high};
-    p = {value = p0};
+    n = {value = row_x0*n0,imin = {0,'mol'},nominal = n_nom};
+    V = {value = V0,nominal = V_nom,priority = priority.high};
+    % p = {value = p0};
   end
 
   equations(Initial = true)
@@ -70,17 +85,31 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
     end
   end
 
-  equations
-    n.der == F;
-    p == if(pressureInput == OnOff.On),
+  intermediates
+    p = (if(pressureInput == OnOff.On),
       pin
     else
       p0
+    end)*exp(k*V/(Vmax-V)); % hard stop
+    Vmax = if(VmaxInput == OnOff.On),
+      Vmax_in
+    else
+      Vmax0
     end;
-    V == z*sum(n)*R*T/p;
+    nn = max_noZC(n,{eps,'mol'}); % avoid negative values
+  end
+
+  equations
+    n.der == F;
+    % p == if(pressureInput == OnOff.On),
+    %   pin
+    % else
+    %   p0
+    % end;
+    V == z*sum(nn)*R*T/p;
     
     Vout == V;
-    Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    Port_A.x == nn(1:N-1,1)/sum(nn);
     Port_A.p == p;
     end
 end
