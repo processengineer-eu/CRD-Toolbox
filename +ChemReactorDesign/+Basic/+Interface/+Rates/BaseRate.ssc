@@ -87,7 +87,7 @@ component (Hidden = true) BaseRate
   end
   
   variables(Access=protected)
-    F = {value={zeros(N,1),'mol/s'},nominal=Port_B.F_nom};
+    F = {value={zeros(N,1),'mol/s'}};
     r = {0,'mol/s'};
   end
 

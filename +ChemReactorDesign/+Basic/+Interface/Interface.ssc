@@ -19,7 +19,7 @@ domain Interface
   end
   
   variables(Balancing = true)
-    F = {zeros(N,1),'mol/s'}; % Molar flow rates
+    F = {zeros(N,1), 'mol/s'}; % Through-Variable 
   end
   
   equations
