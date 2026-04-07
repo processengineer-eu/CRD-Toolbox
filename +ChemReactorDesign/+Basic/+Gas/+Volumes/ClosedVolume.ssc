@@ -8,7 +8,7 @@ component ClosedVolume < BaseVolume
   % Closed Volume : 1.5 : fixed
   % Closed Homogeneous Gas Volume
   %
-  %   (c) Klaus Schnitzlein - 17.02.2026
+  %   (c) Klaus Schnitzlein - 26.03.2026
   %
 
   inputs(ExternalAccess = none)
@@ -80,11 +80,12 @@ component ClosedVolume < BaseVolume
     else
       V0;
     end;
+    nn = max_noZC(n,{eps,'mol'}); % avoid negative values
   end
 
   equations
     n.der == F;
-    p == z*R*T/V*sum(n);
+    p == z*R*T/V*sum(nn);
 
     % und wenn ich V als intermediate definiere??
     % V == if(volumeInputOutput == InOut.Input),
@@ -93,7 +94,7 @@ component ClosedVolume < BaseVolume
     %   V0;
     % end;
     Vout == V;
-    Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    Port_A.x == nn(1:N-1,1)/(sum(nn)+{eps,'mol'});
     Port_A.p == p;
   end
 end

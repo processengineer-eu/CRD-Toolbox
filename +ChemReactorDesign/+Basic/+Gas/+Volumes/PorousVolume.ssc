@@ -1,4 +1,5 @@
 import ChemReactorDesign.Basic.enum.*;
+import ChemReactorDesign.Basic.Functions.*;
 import ChemReactorDesign.Basic.Gas.enum.*;
 import ChemReactorDesign.Basic.Gas.Functions.*;
 import ChemReactorDesign.Basic.Gas.Volumes.*;
@@ -7,7 +8,7 @@ component PorousVolume < BaseVolume
  % Porous Volume : 1.5 : fixed
  % Closed Heterogeneous Gas Volume
  %
- %   (c) Klaus Schnitzlein - 13.02.2026
+ %   (c) Klaus Schnitzlein - 26.03.2026
  % 
 
  inputs(ExternalAccess = none)
@@ -94,12 +95,13 @@ component PorousVolume < BaseVolume
     else
       V0
     end;
+    nn = max_noZC(n,{eps,'mol'}); % avoid negative values
   end
 
   equations
     n.der == F;
     % p.der == z*R/(epsb*V)*(sum(n)*T.der+T*sum(F)); % Annahme: dz/dt = 0 funktioniert nicht
-    p == z*R*T/(epsb*V)*sum(n);
+    p == z*R*T/(epsb*V)*sum(nn);
     % V == if(volumeInputOutput == InOut.Input),
     %   Vin
     % else
@@ -108,7 +110,7 @@ component PorousVolume < BaseVolume
     
     Vout == V;
     mout == (1-epsb)*V*rhos;
-    Port_A.x == n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    Port_A.x == nn(1:N-1,1)/(sum(nn)+{eps,'mol'});
     Port_A.p == p;
    
     assert(epsb <= 1 & epsb > 0,'Invalid voidage fraction');
