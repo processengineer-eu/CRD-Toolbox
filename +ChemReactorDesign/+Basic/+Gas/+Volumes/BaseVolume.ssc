@@ -61,7 +61,7 @@ component (Hidden=true) BaseVolume
 
   variables(Access = protected)
     F = {value = {zeros(N,1),'mol/s'},nominal = Port_A.F_nom};
-    Phi = {value = {0,'kJ/s'},nominal = Port_A.Phi_nom};
+    Phi = {value = {0,'W'},nominal = Port_A.Phi_nom};
     Q = {value = {0,'W'},nominal = Port_A.Q_nom};
     T = {value = T0,nominal = T0,priority = priority.high}; % changed
   end

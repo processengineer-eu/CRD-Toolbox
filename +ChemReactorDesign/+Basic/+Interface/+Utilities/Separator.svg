@@ -9,10 +9,8 @@
       >
   <g  d:options="Port:L0">
     <path d="M110,0 h-110 v100 h70 z"
-	  style="fill:none;stroke:black;stroke-width: 2;"
-	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;" />
+	  style="fill:none;stroke:black;stroke-width: 2;"/>
     <path d="M130,0 h70 v+100 h-110 z"
-	  style="fill:none;stroke:black;stroke-width: 2;"
-	  d:options="PreAdjustStrokeWidth:None;StrokeScalingOnResize:Linear;StrokeScalingOnZoom:Linear;" />
+	  style="fill:none;stroke:black;stroke-width: 2;"/>
   </g>
 </svg>

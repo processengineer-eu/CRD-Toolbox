@@ -7,8 +7,10 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
   % Balloon : 1.5 : fixed
   % Variable Homogeneous Gas Volume 
   %
-  %   (c) Klaus Schnitzlein - 10.03.2026
+  %   (c) Klaus Schnitzlein - 20.05.2026
   
+  % Note: No compression work is accounted for
+
   inputs(ExternalAccess = none)
     Vmax_in = {1,'l'}; % Va
     pin = {0,'bar'}; % p
@@ -18,7 +20,7 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
     [Vmax_in,pin] : Side = top;
     Icon = './Balloon.svg';
     UILayout = [...
-      UIGroup('Options',pressureInput,VmaxInput,volumeOutput,compressionWork,isothermalOperation,enable2ndPort),...
+      UIGroup('Options',pressureInput,VmaxInput,volumeOutput,isothermalOperation,enable2ndPort),...
       UIGroup('Geometry',V0,Vmax0),...
       UIGroup('OperatingConditions',x0,p0,T0),...
       UIGroup('NominalValues',n_nom,V_nom)];
@@ -29,7 +31,7 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
     volumeOutput = OnOff.Off; % Volume Output
     VmaxInput = OnOff.Off; % Maximum Volume Input
     pressureInput = OnOff.Off; % Pressure Input
-    Vmax0 = {1,'l'};   % Maximum Volume
+    Vmax0 = {2,'l'};   % Maximum Volume
     V_nom = {1,'l'};   % Nominal Value for Volume
     n_nom = {1,'mol'}; % Nominal Value for Number of Moles
  end
@@ -74,15 +76,15 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
       T.der == 0;
     end
   else
-    if(compressionWork == OnOff.On)
-      equations
-        sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q + V*p.der;
-      end
-    else
+    % if(compressionWork == OnOff.On)
+    %   equations
+    %     sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q + V*p.der;
+    %   end
+    % else
       equations
         sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q;
       end
-    end
+    % end
   end
 
   intermediates
@@ -96,16 +98,18 @@ component Balloon <ChemReactorDesign.Basic.Gas.Volumes.BaseVolume
     else
       Vmax0
     end;
+    % V = z*sum(nn)*R*T/p;
     nn = max_noZC(n,{eps,'mol'}); % avoid negative values
   end
 
   equations
+    assert(V0 < Vmax0);
     n.der == F;
-    % p == if(pressureInput == OnOff.On),
+    % p == (if(pressureInput == OnOff.On),
     %   pin
     % else
     %   p0
-    % end;
+    % end)*exp(k*V/(Vmax-V)); % hard stop
     V == z*sum(nn)*R*T/p;
     
     Vout == V;

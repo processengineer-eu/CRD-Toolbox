@@ -11,9 +11,7 @@
     <rect x="0" y="0" width="200" height="200"
 	  style="fill:none;stroke:black;stroke-width:2" />
     <rect id="rect_3" fill="none" stroke="black" stroke-width="3"
-	   d:options="PreAdjustStrokeWidth:None;"
 	   x="30" y="40" width="140" height="130" rx="0" ry="0"/>
-
     <path d="M40,115 h120" stroke="black" fill="none" />
     <path d="M60,115 l-20,20" stroke="black" fill="none" />
     <path d="M80,115 l-20,20" stroke="black" fill="none" />

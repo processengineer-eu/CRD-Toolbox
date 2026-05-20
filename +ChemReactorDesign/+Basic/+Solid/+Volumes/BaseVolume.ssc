@@ -7,7 +7,7 @@ component (Hidden=true) BaseVolume
   % BaseVolume : 1.0 : fixed
   % Base Class for Volumes
   %
-  %   (c) Klaus Schnitzlein - 10.09.2025
+  %   (c) Klaus Schnitzlein - 07.04.2026
 
   inputs(ExternalAccess = none)
     pin = {1,'bar'}; % p
@@ -101,7 +101,7 @@ component (Hidden=true) BaseVolume
     Vm = getProperty_T(Port_A.table_T,Port_A.table_Vm,T);
     H = Port_A.H;
     max_n = max_noZC(n,0); 
-    x = n(1:N-1,1)/(sum(n)+{eps,'mol'});
+    x = max_n(1:N-1,1)/(sum(max_n)+{eps,'mol'});
   end
   
   equations

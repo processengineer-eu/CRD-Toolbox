@@ -75,7 +75,7 @@ component ClosedVolume < BaseVolume
   end
 
   intermediates
-    V =if(volumeInputOutput == InOut.Input),
+    V = if(volumeInputOutput == InOut.Input),
       max_noZC(Vin,{eps,'l'})
     else
       V0;

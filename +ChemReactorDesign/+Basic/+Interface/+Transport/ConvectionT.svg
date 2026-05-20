@@ -16,7 +16,6 @@
 	  stroke="black" stroke-width="2" fill="none"/>
     <polyline points="30,75 60,75"
 	  stroke="black" stroke-width="2" fill="none"/>
-
     <polyline points="80,35 150,35"
 	      fill="none" stroke-width="2" stroke="black" />   
    <polyline points="150,35 150,25 170,35 150,45 150,35" 

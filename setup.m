@@ -1,15 +1,17 @@
-%% Setup for CRD-Toolbox
+% %% Setup for CRD-Toolbox
 %
-%    (c) Klaus Schnitzlein - 10.11.2025
+%    (c) Klaus Schnitzlein - 05.05.2026
 
 fprintf('Setting Path to %s\n',pwd);
 addpath('.');
 addpath(genpath('Functions')); 
 addpath(genpath('Icons')); 
 addpath(genpath('Data')); 
+addpath(genpath('ExtendedLibrary')); 
 
 fprintf('Setting Root Directory\n');
 setenv('root_CRD',pwd);
+% userdata(getenv('root_CRD'));
 
 fprintf('Adding Units\n');
 pm_addunit('cal',4.1868,'J');
