@@ -11,6 +11,9 @@ function blkStruct = slblocks
     
     Browser(3).Library = 'PDELibrary_lib';
     Browser(3).Name = 'Chemical Reactor Design PDE Library';
+   
+    Browser(4).Library = 'CompositeLibrary_lib';
+    Browser(4).Name = 'Composite Library';
 
     blkStruct.Browser = Browser;
 

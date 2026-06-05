@@ -1,6 +1,6 @@
 % %% Setup for CRD-Toolbox
 %
-%    (c) Klaus Schnitzlein - 05.05.2026
+%    (c) Klaus Schnitzlein - 01.06.2026
 
 fprintf('Setting Path to %s\n',pwd);
 addpath('.');
@@ -17,8 +17,8 @@ fprintf('Adding Units\n');
 pm_addunit('cal',4.1868,'J');
 pm_addunit('kcal',4.1868,'kJ');
 pm_addunit('kmol',1.0e+03,'mol');
-pm_addunit('torr',1.33e-03,'bar');
-pm_addunit('mmHg',1.0e-03,'bar');
+pm_addunit('torr',1.33322e-03,'bar');
+pm_addunit('mmHg',1.33322e-03,'bar');
 
 fprintf('Refreshing Simulink Customizations\n');
 sl_refresh_customizations;

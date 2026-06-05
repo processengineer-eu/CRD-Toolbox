@@ -1,105 +1,191 @@
+%% Customization of Context Menu - for R2026a
+%
+%  (c) Klaus Schnitzlein - 25.05.2026
+
 function sl_customization(cm)
-cm.addCustomMenuFcn('Simulink:PreContextMenu', @getTestMenu);
+  cm.addCustomMenuFcn('Simulink:ContextMenu', @getMenuItems);
+  cm.LibraryBrowserCustomizer.applyOrder({
+    'Chemical Reactor Design ToolBox',         -3, ...
+    'Chemical Reactor Design Extended Library',-2, ...
+    'Chemical Reactor Design PDE Library',     -1
+    });
 end
 
-function schemaFcns = getTestMenu(~)
-  schemaFcns = {@testMenu};
+function schemaFcns = getMenuItems(~)
+  schemaFcns = {@Menu1};
 end
 
-function schema = testMenu(callbackInfo)
-disp1sfd(cawqerllbackInfo)
+function schema = Menu1(~)
+  schema = sl_container_schema;
+  schema.tag = "Menu1";
+  schema.label = "Plot";
+  schema.childrenFcns = {@MenuPropertiesGas,@MenuPropertiesLiquid,@MenuPropertiesSolid};
+end
+
+function schema = MenuPropertiesGas(~)
+schema = sl_container_schema;
+schema.tag = "plotPropertiesGas";
+schema.label = "Properties Gas";
+schema.childrenFcns = {@ItemGasEnthalpy,@ItemGasGibbsEnergy,...
+  @ItemGasHeatCapacity,@ItemGasViscosity,@ItemGasHeatConductivity};
+end
+
+function schema = MenuPropertiesLiquid(~)
+schema = sl_container_schema;
+schema.tag = "plotPropertiesLiquid";
+schema.label = "Properties Liquid";
+schema.childrenFcns = {@ItemLiquidMolarVolume,@ItemLiquidEnthalpy,...
+  @ItemLiquidGibbsEnergy,@ItemLiquidHeatCapacity,@ItemLiquidViscosity,...
+  @ItemLiquidHeatConductivity,@ItemLiquidVaporPressure,...
+  @ItemLiquidHeatOfVaporization};
+end
+
+function schema = MenuPropertiesSolid(~)
+schema = sl_container_schema;
+schema.tag = "plotPropertiesSolid";
+schema.label = "Properties Solid";
+schema.childrenFcns = {@ItemSolidMolarVolume,@ItemSolidEnthalpy,...
+  @ItemSolidGibbsEnergy,@ItemSolidHeatCapacity,@ItemSolidHeatConductivity};
+end
+
+%% Enthalpy
+
+function schema = ItemGasEnthalpy(~)
 schema = sl_action_schema;
-schema.tag = "myTestMenu";
-schema.label = "My Test Menu";
-schema.callback = @myTestCallback;
+schema.tag = "ItemGasEnthalpy";
+schema.label = "Enthalpy";
+schema.callback = @plotGasEnthalpy;
 end
 
-function myTestCallback(~, callbackInfo)
-msgbox("Test menu invoked");
+function schema = ItemLiquidEnthalpy(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidEnthalpy";
+schema.label = "Enthalpy";
+schema.callback = @plotLiquidEnthalpy;
 end
 
+function schema = ItemSolidEnthalpy(~)
+schema = sl_action_schema;
+schema.tag = "ItemSolidEnthalpy";
+schema.label = "Enthalpy";
+schema.callback = @plotSolidEnthalpy;
+end
 
-% function sl_customization(cm)
-% % Menü oben (PreContextMenu)
-% cm.addCustomMenuFcn('Simulink:PreContextMenu', @getMyMenuItems);
-% 
-% % Reihenfolge für Library Browser (optional)
-% cm.LibraryBrowserCustomizer.applyOrder({
-%   'Chemical Reactor Design ToolBox',          -3, ...
-%   'Chemical Reactor Design Extended Library', -2, ...
-%   'Chemical Reactor Design PDE Library',      -1
-%   });
-% end
-% 
-% function schemaFcns = getMyMenuItems(callbackInfo)
-% % Liste der Schema-Funktionen (Action-Schemata)
-% schemaFcns = {
-%   @menuDatabaseLiquid, ...
-%   @menuPropertiesLiquid, ...
-%   @menuDatabaseGas, ...
-%   @menuPropertiesGas, ...
-%   @menuDatabaseSolid, ...
-%   @menuPropertiesSolid, ...
-%   @menuPropertiesXGas
-%   };
-% end
-% 
-% function schema = menuDatabaseLiquid(~)
-% schema = sl_action_schema;
-% schema.tag      = "dbLiquid";
-% schema.label    = 'Database Liquid';
-% schema.callback = @sl_plotDataBaseLiquid; % separate Funktion
-% end
-% 
-% function schema = menuDatabaseGas(callbackInfo)
-% schema = sl_action_schema;
-% schema.tag   = "dbGas";
-% schema.label = "Database Gas";
-% try
-%   bh = callbackInfo.BlockHandle;
-%   name = get_param(bh, 'Name');
-% catch
-%   schema.state = 'Hidden';
-%   return
-% end
-% if contains(name, 'Database Gas')
-%   schema.callback = @sl_plotDataBaseGas; % Top-Level-Funktion
-% else
-%   schema.state = 'Hidden';
-% end
-% end
-% 
-% function schema = menuPropertiesLiquid(~)
-% schema = sl_action_schema;
-% schema.tag      = "propsLiquid";
-% schema.label    = 'Properties Liquid';
-% schema.callback = @sl_plotPropertiesLiquid;
-% end
-% 
-% function schema = menuPropertiesGas(~)
-% schema = sl_action_schema;
-% schema.tag      = "propsGas";
-% schema.label    = 'Properties Gas';
-% schema.callback = @sl_plotPropertiesGas;
-% end
-% 
-% function schema = menuDatabaseSolid(~)
-% schema = sl_action_schema;
-% schema.tag      = "dbSolid";
-% schema.label    = 'Database Solid';
-% schema.callback = @sl_plotDataBaseSolid;
-% end
-% 
-% function schema = menuPropertiesSolid(~)
-% schema = sl_action_schema;
-% schema.tag      = "propsSolid";
-% schema.label    = 'Properties Solid';
-% schema.callback = @sl_plotPropertiesSolid;
-% end
-% 
-% function schema = menuPropertiesXGas(~)
-% schema = sl_action_schema;
-% schema.tag      = "propsXGas";
-% schema.label    = 'PropertiesX Gas';
-% schema.callback = @sl_plotPropertiesXGas;
-% end
+%% Gibbs Energy
+
+function schema = ItemGasGibbsEnergy(~)
+schema = sl_action_schema;
+schema.tag = "ItemGasGibbsEnergy";
+schema.label = "Gibbs Energy";
+schema.callback = @plotGasEnergy;
+end
+
+function schema = ItemLiquidGibbsEnergy(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidGibbsEnergy";
+schema.label = "Gibbs Energy";
+schema.callback = @plotLiquidEnergy;
+end
+
+function schema = ItemSolidGibbsEnergy(~)
+schema = sl_action_schema;
+schema.tag = "ItemSolidGibbsEnergy";
+schema.label = "Gibbs Energy";
+schema.callback = @plotSolidEnergy;
+end
+
+%% Heat Capacity
+
+function schema = ItemGasHeatCapacity(~)
+schema = sl_action_schema;
+schema.tag = "ItemGasHeatCapacity";
+schema.label = "Heat Capacity";
+schema.callback = @plotGasHeatCapacity;
+end
+
+function schema = ItemLiquidHeatCapacity(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidHeatCapacity";
+schema.label = "Heat Capacity";
+schema.callback = @plotLiquidHeatCapacity;
+end
+
+function schema = ItemSolidHeatCapacity(~)
+schema = sl_action_schema;
+schema.tag = "ItemSolidHeatCapacity";
+schema.label = "Heat Capacity";
+schema.callback = @plotSolidHeatCapacity;
+end
+
+%% Viscosity
+
+function schema = ItemGasViscosity(~)
+schema = sl_action_schema;
+schema.tag = "ItemGasViscosity";
+schema.label = "Viscosity";
+schema.callback = @plotGasViscosity;
+end
+
+function schema = ItemLiquidViscosity(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidViscosity";
+schema.label = "Viscosity";
+schema.callback = @plotLiquidViscosity;
+end
+
+%% Heat Conductivity
+
+function schema = ItemGasHeatConductivity(~)
+schema = sl_action_schema;
+schema.tag = "ItemGasHeatConductivity";
+schema.label = "Heat Conductivity";
+schema.callback = @plotGasHeatConductivity;
+end
+
+function schema = ItemLiquidHeatConductivity(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidHeatConductivity";
+schema.label = "Heat Conductivity";
+schema.callback = @plotLiquidHeatConductivity;
+end
+
+function schema = ItemSolidHeatConductivity(~)
+schema = sl_action_schema;
+schema.tag = "ItemSolidHeatConductivity";
+schema.label = "Heat Conductivity";
+schema.callback = @plotSolidHeatConductivity;
+end
+
+%% Molar Volume
+
+function schema = ItemLiquidMolarVolume(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidMolarVolume";
+schema.label = "Molar Volume";
+schema.callback = @plotLiquidMolarVolume;
+end
+
+function schema = ItemSolidMolarVolume(~)
+schema = sl_action_schema;
+schema.tag = "ItemSolidMolarVolume";
+schema.label = "Molar Volume";
+schema.callback = @plotSolidMolarVolume;
+end
+
+%% Vapor Pressure
+
+function schema = ItemLiquidVaporPressure(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidVaporPressure";
+schema.label = "Vapor Pressure";
+schema.callback = @plotLiquidVaporPressure;
+end
+
+%% Heat of Vaporization
+
+function schema = ItemLiquidHeatOfVaporization(~)
+schema = sl_action_schema;
+schema.tag = "ItemLiquidHeatOfVaporization";
+schema.label = "Heat of Vaporization";
+schema.callback = @plotLiquidHeatOfVaporization;
+end
