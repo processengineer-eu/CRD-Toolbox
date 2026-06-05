@@ -15,7 +15,7 @@ component ReadOutM
 
   outputs(ExternalAccess = none)
     out_mu = {1.0e-04,'Pa*s'}; % mu
-    out_lambda = {1.0e-04,'W/(m*K)'}; % la
+    out_lambda = {1.0e-04,'W/(m*K)'}; % lambda
   end
 
   annotations

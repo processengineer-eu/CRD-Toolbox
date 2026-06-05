@@ -1,13 +1,14 @@
 import ChemReactorDesign.Basic.Gas.*;
 import ChemReactorDesign.Basic.Liquid.*;
+import ChemReactorDesign.Basic.Liquid.enum.*;
 import ChemReactorDesign.Basic.enum.*;
 import ChemReactorDesign.Basic.Functions.*;
 
 component VLE
-  % VLE : 1.5 : fixed
+  % VLE : 1.5
   % Vapor-Liquid Equilibrium VLE
   %
-  %   (c) Klaus Schnitzlein - 27.08.2025
+  %   (c) Klaus Schnitzlein - 03.06.2026
 
   nodes
     Port_B_G = Gas;     %
@@ -44,6 +45,7 @@ component VLE
   
   parameters
     areaInput = OnOff.Off;           % AreaInput
+    mode = VLE_Operation.Boiling;    % Operation Mode 
     nu_L = {[-1;0],'1'};             % Stoichiometric Coefficients (Liquid)
     nu_G = {[1;0],'1'};              % Stoichiometric Coefficients (Gas)
     k = {0,'mol/(m^2*s)'};           % Rate Constants
@@ -131,13 +133,17 @@ component VLE
     tvap = regStep(pbubble-p+psmall,1,0,psmall);
     rvap = max_x;
     rcond = max_y./K;
-    r = (tvap+tcond)*k.*(rvap-rcond);
+    r = if(mode == VLE_Operation.Boiling)
+      (tvap+tcond)*k.*(rvap-rcond);
+    else %(mode == VLE_Operation.Evaporation)
+      k.*(rvap-rcond);
+    end;
 
     H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,Port_B_G.T);
     H_L = getProperty_T(Port_B_L.table_T,Port_B_L.table_H,Port_B_L.T);
     Hv = -(sel_G*H_G-sel_L*H_L);
   end
-  
+ 
   equations
     F_G == nu_G*r*A;
     F_L == nu_L*r*A;

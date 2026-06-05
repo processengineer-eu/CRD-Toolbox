@@ -6,7 +6,7 @@ component Conduction
   %   (c) Klaus Schnitzlein - 29.01.2025
   
   inputs(ExternalAccess = none)
-    lambdaIn = {1.0e-04,'W/(m*K)'};
+    lambdaIn = {1.0e-04,'W/(m*K)'}; % lambda
     Ain = {0,'m^2'}; % A
   end
 

@@ -1,6 +1,6 @@
 % Enumeration Class for Gas Species
 %
-% (c) Klaus Schnitzlein - 12.05.2025
+% (c) Klaus Schnitzlein - 22.05.2026
 
 classdef SpeciesName < int32
   enumeration
@@ -34,6 +34,7 @@ classdef SpeciesName < int32
     N2O4 (27)
     C2H2 (28)
     C2H6 (29)
+    C3H6O (30)
   end
   methods (Static) 
     
@@ -69,6 +70,7 @@ classdef SpeciesName < int32
       map('N2O4') = 'N2O4';
       map('C2H2') = 'C2H2';
       map('C2H6') = 'C2H6';
+      map('C3H6O') = 'C3H6O';
     end
 
     function map = displayFileName()
@@ -103,6 +105,7 @@ classdef SpeciesName < int32
       map('N2O4') = 'Nitrogen_tetroxide';
       map('C2H2') = 'Acetylene';
       map('C2H6') = 'Ethane';
+      map('C3H6O') = 'Acetone';
     end
 	end
 end
