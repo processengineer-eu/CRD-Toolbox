@@ -1,0 +1,368 @@
+{
+  "mw.schemaVersion": "1.0.0",
+
+  "mw.simulink.editor.contextMenu.focusMenu:after": [
+    "#myCustomMenus.myMenuSectionWrapperGas",
+    "#myCustomMenus.myMenuSectionWrapperLiquid",
+    "#myCustomMenus.myMenuSectionWrapperSolid"
+  ],
+
+  "myCustomMenus.myMenuSectionWrapperGas": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionWrapperGas",
+    "when": "selection.Name == 'Properties Gas'",
+    "items": [
+      {
+        "type": "DropDownItem",
+        "name": "myCustomMenus.myMainMenuGas",
+        "popup": "#myCustomMenus.myMenuGas",
+        "textOverride": "Plot"
+      }
+    ]
+  },
+
+  "myCustomMenus.myMenuGas": {
+    "type": "Menu",
+    "name": "myCustomMenus.myMenuGas",
+    "sections": [
+      "#myCustomMenus.myMenuSectionGas"
+    ]
+  },
+
+  "myCustomMenus.myMenuSectionGas": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionGas",
+    "visible": true,
+    "text": "Plot Properties",
+    "items": [
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemGas1",
+        "text": "Gas Enthalpy",
+        "action": "#myCustomMenus.doPlotGasEnthalpy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemGas2",
+        "text": "Gas Energy",
+        "action": "#myCustomMenus.doPlotGasEnergy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemGas3",
+        "text": "Gas Heat Capacity",
+        "action": "#myCustomMenus.doPlotGasHeatCapacity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemGas4",
+        "text": "Gas Heat Conductivity",
+        "action": "#myCustomMenus.doPlotGasConductivity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemGas5",
+        "text": "Gas Heat Viscosity",
+        "action": "#myCustomMenus.doPlotGasViscosity"
+      }
+    ]
+  },
+
+  "myCustomMenus.doPlotGasEnthalpy": {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotGasEnthalpy",
+    "text": "Enthalpy",
+    "description": "plot Gas Enthalpy for all species",
+    "callback": "plotGasEnthalpy"
+  },
+
+  "myCustomMenus.doPlotGasEnergy":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotGasEnergy",
+    "text": "Gibbs Energy",
+    "description": "plot Gas Energy for all species",
+    "callback": "plotGasEnergy"  
+  },
+
+  "myCustomMenus.doPlotGasHeatCapacity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotGasHeatCapacity",
+    "text": "Heat Capacity",
+    "description": "plot Gas Heat Capacity for all species",
+    "callback": "plotGasHeatCapacity"
+  },
+
+  "myCustomMenus.doPlotGasConductivity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotGasConductivity",
+    "text": "Heat Conductivity",
+    "description": "plot Gas Heat Conductivity",
+    "callback": "plotGasHeatConductivity"
+  },
+
+  "myCustomMenus.doPlotGasViscosity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotGasViscosity",
+    "text": "Viscosity",
+    "description": "plot Gas Viscosity",
+    "callback": "plotGasViscosity"
+  },
+
+  "myCustomMenus.myMenuSectionWrapperLiquid": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionWrapperLiquid",
+    "when": "selection.Name == 'Properties Liquid'",
+    "items": [
+      {
+        "type": "DropDownItem",
+        "name": "myCustomMenus.myMainMenuLiquid",
+        "popup": "#myCustomMenus.myMenuLiquid",
+        "textOverride": "Plot"
+      }
+    ]
+  },
+
+  "myCustomMenus.myMenuLiquid": {
+    "type": "Menu",
+    "name": "myCustomMenus.myMenuLiquid",
+    "sections": [
+      "#myCustomMenus.myMenuSectionLiquid"
+    ]
+  },
+
+  "myCustomMenus.myMenuSectionLiquid": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionLiquid",
+    "visible": true,
+    "text": "Plot Properties",
+    "items": [
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid1",
+        "text": "Liquid Enthalpy",
+        "action": "#myCustomMenus.doPlotLiquidEnthalpy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid2",
+        "text": "Liquid Energy",
+        "action": "#myCustomMenus.doPlotLiquidEnergy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid3",
+        "text": "Liquid Heat Capacity",
+        "action": "#myCustomMenus.doPlotLiquidHeatCapacity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid4",
+        "text": "Liquid Heat Conductivity",
+        "action": "#myCustomMenus.doPlotLiquidConductivity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid5",
+        "text": "Liquid Heat Viscosity",
+        "action": "#myCustomMenus.doPlotLiquidViscosity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid6",
+        "text": "Liquid Molar Volume",
+        "action": "#myCustomMenus.doPlotLiquidMolarVolume"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid7",
+        "text": "Liquid Heat of Vaporization",
+        "action": "#myCustomMenus.doPlotLiquidHeatOfVaporization"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemLiquid8",
+        "text": "Liquid Vapor Pressure",
+        "action": "#myCustomMenus.doPlotLiquidVaporPressure"
+      }
+    ]
+  },
+
+  "myCustomMenus.doPlotLiquidEnthalpy": {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidEnthalpy",
+    "text": "Enthalpy",
+    "description": "plot Liquid Enthalpy for all species",
+    "callback": "plotLiquidEnthalpy"
+  },
+
+  "myCustomMenus.doPlotLiquidEnergy":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidEnergy",
+    "text": "Gibbs Energy",
+    "description": "plot Liquid Energy for all species",
+    "callback": "plotLiquidEnergy"  
+  },
+
+  "myCustomMenus.doPlotLiquidHeatCapacity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidHeatCapacity",
+    "text": "Heat Capacity",
+    "description": "plot Liquid Heat Capacity for all species",
+    "callback": "plotLiquidHeatCapacity"
+  },
+
+  "myCustomMenus.doPlotLiquidConductivity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidConductivity",
+    "text": "Heat Conductivity",
+    "description": "plot Liquid Heat Conductivity",
+    "callback": "plotLiquidHeatConductivity"
+  },
+
+  "myCustomMenus.doPlotLiquidViscosity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidViscosity",
+    "text": "Viscosity",
+    "description": "plot Liquid Viscosity",
+    "callback": "plotLiquidViscosity"
+  },
+
+  "myCustomMenus.doPlotLiquidMolarVolume":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidMolarVolume",
+    "text": "Molar Volume",
+    "description": "plot Liquid Molar Volume",
+    "callback": "plotLiquidMolarVolume"
+  },
+
+  "myCustomMenus.doPlotLiquidHeatOfVaporization":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidHeatOfVaporization",
+    "text": "Heat of Vaporization",
+    "description": "plot Liquid Heat of Vaporization",
+    "callback": "plotLiquidHeatOfVaporization"
+  },
+  "myCustomMenus.doPlotLiquidVaporPressure":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotLiquidVaporPressure",
+    "text": "Vapor Pressure",
+    "description": "plot Liquid Vapor Pressure",
+    "callback": "plotLiquidVaporPressure"
+  },
+
+  "myCustomMenus.myMenuSectionWrapperSolid": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionWrapperSolid",
+    "when": "selection.Name == 'Properties Solid'",
+    "items": [
+      {
+        "type": "DropDownItem",
+        "name": "myCustomMenus.myMainMenuSolid",
+        "popup": "#myCustomMenus.myMenuSolid",
+        "textOverride": "Plot"
+      }
+    ]
+  },
+
+  "myCustomMenus.myMenuSolid": {
+    "type": "Menu",
+    "name": "myCustomMenus.myMenuSolid",
+    "sections": [
+      "#myCustomMenus.myMenuSectionSolid"
+    ]
+  },
+
+  "myCustomMenus.myMenuSectionSolid": {
+    "type": "MenuSection",
+    "name": "myCustomMenus.myMenuSectionSolid",
+    "visible": true,
+    "text": "Plot Properties",
+    "items": [
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemSolid1",
+        "text": "Solid Enthalpy",
+        "action": "#myCustomMenus.doPlotSolidEnthalpy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemSolid2",
+        "text": "Solid Energy",
+        "action": "#myCustomMenus.doPlotSolidEnergy"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemSolid3",
+        "text": "Solid Heat Capacity",
+        "action": "#myCustomMenus.doPlotSolidHeatCapacity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemSolid4",
+        "text": "Solid Heat Conductivity",
+        "action": "#myCustomMenus.doPlotSolidConductivity"
+      },
+      {
+        "type": "MenuItem",
+        "name": "myCustomMenus.myMenuItemSolid5",
+        "text": "Solid Molar Volume",
+        "action": "#myCustomMenus.doPlotSolidMolarVolume"
+      }
+    ]
+  },
+
+  "myCustomMenus.doPlotSolidEnthalpy": {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotSolidEnthalpy",
+    "text": "Enthalpy",
+    "description": "plot Solid Enthalpy for all species",
+    "callback": "plotSolidEnthalpy"
+  },
+
+  "myCustomMenus.doPlotSolidEnergy":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotSolidEnergy",
+    "text": "Gibbs Energy",
+    "description": "plot Solid Energy for all species",
+    "callback": "plotSolidEnergy"  
+  },
+
+  "myCustomMenus.doPlotSolidHeatCapacity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotSolidHeatCapacity",
+    "text": "Heat Capacity",
+    "description": "plot Solid Heat Capacity for all species",
+    "callback": "plotSolidHeatCapacity"
+  },
+
+  "myCustomMenus.doPlotSolidConductivity":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotSolidConductivity",
+    "text": "Heat Conductivity",
+    "description": "plot Solid Heat Conductivity",
+    "callback": "plotSolidHeatConductivity"
+  },
+
+  "myCustomMenus.doPlotSolidMolarVolume":
+  {
+    "type": "Action",
+    "name": "myCustomMenus.doPlotSolidMolarVolume",
+    "text": "Molar Volume",
+    "description": "plot Solid Molar Volume",
+    "callback": "plotSolidMolarVolume"
+  }
+}
