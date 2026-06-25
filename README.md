@@ -89,7 +89,7 @@ Run the setup script.
 
 ## Examples
 
-Examples can be found in the respective folder.
+Examples are separately distributed as package on Matlab File Exchange.
 
 
 ## API Reference Manual
