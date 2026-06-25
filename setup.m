@@ -1,6 +1,6 @@
 % %% Setup for CRD-Toolbox
 %
-%    (c) Klaus Schnitzlein - 01.06.2026
+%    (c) Klaus Schnitzlein - 18.06.2026
 
 fprintf('Setting Path to %s\n',pwd);
 addpath('.');
@@ -20,8 +20,9 @@ pm_addunit('kmol',1.0e+03,'mol');
 pm_addunit('torr',1.33322e-03,'bar');
 pm_addunit('mmHg',1.33322e-03,'bar');
 
-fprintf('Refreshing Simulink Customizations\n');
-sl_refresh_customizations;
+fprintf('Reloading Simulink Customizations\n');
+% slUIDeveloperMode(true);
+slReloadStudioConfig;
 
 answer = questdlg('Compilation of Library?', ...
 	'Question', ...

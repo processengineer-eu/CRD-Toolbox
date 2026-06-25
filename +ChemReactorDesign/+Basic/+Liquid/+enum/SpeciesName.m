@@ -27,6 +27,13 @@ classdef SpeciesName < int32
     CH3CHO (20)
     Ag_p (21)
     H_p (22)
+    C15H266 (23)
+    C11H20O5 (24)
+    C7H14O4 (25)
+    C4H8O2 (26)
+    C3H8O2 (27)
+    A5 (28)
+    A6 (29)
   end
   methods (Static) 
     
@@ -55,6 +62,13 @@ classdef SpeciesName < int32
       map('CH3CHO') = 'CH3CHO';
       map('Ag_p') = 'Ag^+';
       map('H_p')= 'H^+';
+      map('C15H266') = 'Tributyrin';
+      map('C11H20O5') = 'Dibutyrin'; 
+      map('C7H14O4') = 'Monobutyrin';
+      map('C4H8O2') = 'ButyricAcid';
+      map('C3H8O2') = 'Glycerol';
+      map('A5') = 'A5';
+      map('A6') = 'A6';
     end
 
     function map = displayFileName()
@@ -82,6 +96,13 @@ classdef SpeciesName < int32
       map('CH3CHO') = 'Acetaldehyde';
       map('Ag_p') = 'Silver_cation';
       map('H_p') = 'Hydrogen_cation';
+      map('C15H266') = 'Tributyrin';
+      map('C11H20O5') = 'Dibutyrin'; 
+      map('C7H14O4') = 'Monobutyrin';
+      map('C4H8O2') = 'Butyric_Acid';
+      map('C3H8O2') = 'Glycerol';
+      map('A5') = 'A5';
+      map('A6') = 'A6';
     end
 	end
 end
