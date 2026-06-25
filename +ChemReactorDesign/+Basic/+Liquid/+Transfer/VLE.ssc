@@ -8,7 +8,7 @@ component VLE
   % VLE : 1.5
   % Vapor-Liquid Equilibrium VLE
   %
-  %   (c) Klaus Schnitzlein - 03.06.2026
+  %   (c) Klaus Schnitzlein - 12.06.2026
 
   nodes
     Port_B_G = Gas;     %
@@ -16,10 +16,10 @@ component VLE
   end
 
   inputs(ExternalAccess = none)
-    Ain = {0,'m^2'}; % S
+    Ain = {0,'m^2'}; % A
   end
 
-  inputs 
+  inputs(ExternalAccess = none)
     Vin = {0,'l'}; % V
   end
 
@@ -30,11 +30,9 @@ component VLE
     [Ain,Vin] : Side = top;
     UILayout = [...
       UIGroup('Options',areaInput),...
-      UIGroup('Geometry',A0,VinMin),...
+      UIGroup('Geometry',A0,V0),...
       UIGroup('Stoichiometry',nu_G,nu_L),...
-      UIGroup('Kinetics',k)];
-    [r] : LoggingUnit = 'mol/(m^2*s)';
-    [Vin] : LoggingUnit = 'l';
+      UIGroup('Kinetics',kV,kA)];
   end
   
   parameters(Access = private)
@@ -45,21 +43,25 @@ component VLE
   
   parameters
     areaInput = OnOff.Off;           % AreaInput
+    volumeInput = OnOff.Off;         % VolumeInput
     mode = VLE_Operation.Boiling;    % Operation Mode 
     nu_L = {[-1;0],'1'};             % Stoichiometric Coefficients (Liquid)
     nu_G = {[1;0],'1'};              % Stoichiometric Coefficients (Gas)
-    k = {0,'mol/(m^2*s)'};           % Rate Constants
-    VinMin = {1.0e-10,'l'};          % Minimum Liquid Volume
+    kA = {0,'mol/(m^2*s)'};          % Rate Constants (Area Based)
+    kV = {0,'mol/(m^3*s)'};          % Rate Constants (Volume Based)
   end
 
   parameters(ExternalAccess = none)
     A0 = {1,'m^2'};      % Exchange Area
+    V0 = {1,'m^3'};      % Boiling Volume
     max_p = {10,'bar'};  % Maximum Pressure
     psmall = {10,'Pa'};  % Pressure Hysteresis (nicht zu klein wählen)
   end
   
   parameters(Access = private)
     Ids = Port_B_L.Ids;
+    VMin = {1.0e-10,'l'};
+    AMin = {1.0e-10,'cm^2'};
   end
 
   equations
@@ -71,8 +73,10 @@ component VLE
       'invalid stoichiometric coefficients for liquid phase');
     assert(sum(sum(1*(nu_G == 1),1)) == M,...
       'invalid stoichiometric coefficents for gas phase');
-    assert(length(k) == M,...
-      'invalid size of rate constants');
+    assert(length(kA) == M,...
+      'invalid size of rate constants kA');
+    assert(length(kA) == M,...
+      'invalid size of rate constants kV');
   end
 
   if(areaInput == OnOff.On)
@@ -92,12 +96,30 @@ component VLE
     end
   end
 
+  if(volumeInput == OnOff.On)
+    equations
+      V == Vin;
+    end
+    annotations
+      Vin : ExternalAccess = modify;
+      V0 : ExternalAccess = none;
+    end
+  elseif(volumeInput == OnOff.Off)
+    annotations
+      V0 : ExternalAccess = modify;
+    end
+    equations
+      V == V0;
+    end
+  end
+
   variables(Access=private)
     F_G = {zeros(N_G,1),'mol/s'};
     Phi_G = {0,'W'};
     F_L = {zeros(N_L,1),'mol/s'};
     Phi_L = {0,'W'};
     A  = {0,'m^2'};
+    V = {0,'m^3'};
   end
 
   branches
@@ -121,8 +143,6 @@ component VLE
     x = sel_L*checkMoleFractions(Port_B_L.x);
     max_x = max_noZC(x,eps);
 
-    lambda_L = regStep(Vin-VinMin,1,0,VinMin);
-    
     pvap = sel_L*getProperty_T(Port_B_L.table_T,Port_B_L.table_pvap,Port_B_L.T);
     gamma = sel_L*Port_B_L.gamma;
     pbubble = lambda_L*sum(max_x.*gamma.*pvap); % neu
@@ -133,21 +153,33 @@ component VLE
     tvap = regStep(pbubble-p+psmall,1,0,psmall);
     rvap = max_x;
     rcond = max_y./K;
-    r = if(mode == VLE_Operation.Boiling)
-      (tvap+tcond)*k.*(rvap-rcond);
-    else %(mode == VLE_Operation.Evaporation)
-      k.*(rvap-rcond);
-    end;
-
+    
     H_G = getProperty_T(Port_B_G.table_T,Port_B_G.table_H,Port_B_G.T);
     H_L = getProperty_T(Port_B_L.table_T,Port_B_L.table_H,Port_B_L.T);
     Hv = -(sel_G*H_G-sel_L*H_L);
   end
  
-  equations
-    F_G == nu_G*r*A;
-    F_L == nu_L*r*A;
-    Phi_G == sum(F_G.*H_G); 
-    Phi_L == sum(F_L.*H_L) + A*sum(r.*Hv); 
+  if(mode == VLE_Operation.Boiling)
+    intermediates
+      lambda_L = regStep(V-VMin,1,0,VMin);
+      r = kV.*(tvap+tcond)*(rvap-rcond);
+    end
+    equations
+      F_G == nu_G*V*r;
+      F_L == nu_L*V*r;
+      Phi_G == sum(F_G.*H_G); 
+      Phi_L == sum(F_L.*H_L) + V*sum(r.*Hv); 
+    end
+  else %(mode == VLE_Operation.Evaporation)
+    intermediates
+      lambda_L = regStep(A-AMin,1,0,AMin);
+      r = kA.*(rvap-rcond);
+    end
+    equations
+      F_G == nu_G*A*r;
+      F_L == nu_L*A*r;
+      Phi_G == sum(F_G.*H_G); 
+      Phi_L == sum(F_L.*H_L) + A*sum(r.*Hv); 
+    end
   end
 end

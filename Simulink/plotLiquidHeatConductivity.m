@@ -1,14 +1,15 @@
-function plotLiquidViscosity(~, callbackInfo)
+function plotLiquidHeatConductivity(~, callbackInfo)
 if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
-  mu = str2num(get_param(gcbh,'table_mu'));
+  lambda = str2num(get_param(gcbh,'table_lambda'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Liquid',Ids);
-  plot(T,mu,'linewidth',2.0)
+  % species = retrieveSpecies('Liquid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
+  plot(T,lambda,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
-  ylabel('\mu [Pa*s]')
+  ylabel('\lambda [W/(m*K)]')
   grid on
   legend(species)
 else

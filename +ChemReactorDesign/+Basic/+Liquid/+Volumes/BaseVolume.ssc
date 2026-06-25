@@ -32,6 +32,7 @@ component (Hidden=true) BaseVolume
     Port_C : Side = bottom;
     [Vout] : Side = top;
     H : LoggingUnit = 'kJ/mol';
+    c : LoggingUnit = 'mol/l';
   end
 
   parameters
@@ -106,8 +107,9 @@ component (Hidden=true) BaseVolume
     cp = getProperty_T(Port_A.table_T,Port_A.table_cp,T);
     Vm = getProperty_T(Port_A.table_T,Port_A.table_Vm,T);
     H = Port_A.H;
-    x = n(1:N-1,1)/(sum(n)+{eps,'mol'});
     max_n = max_noZC(n,{eps,'mol'});
+    x = max_n(1:N-1,1)/(sum(max_n)+{eps,'mol'});
+    c = getConc([x;1-sum(x)],Vm); 
   end
   
   equations(Initial = true)

@@ -9,7 +9,7 @@ component (Propagation = blocks) LLE
   % LLE: 1.5 
   % Mass Transfer by Partition 
   %
-  %   (c) Klaus Schnitzlein - 30.07.2025
+  %   (c) Klaus Schnitzlein - 17.06.2026
 
   inputs(ExternalAccess = none)
     Ain = {0,'m^2'}; % A
@@ -44,7 +44,7 @@ component (Propagation = blocks) LLE
 
   parameters(Access = private)
     N1 = Port_B1.N;
-    N2 = Port_B1.N;   
+    N2 = Port_B2.N;   
     M = size(nu1,2);
   end
  

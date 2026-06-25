@@ -1,10 +1,11 @@
-function plotGasEnthalpy(~, callbackInfo)
-if(contains(get_param(gcbh,'Name'),'Properties Gas'))
+function plotSolidEnthalpy(~, callbackInfo)
+if(contains(get_param(gcbh,'Name'),'Properties Solid'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
   H = str2num(get_param(gcbh,'table_H'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Solid',Ids);
+  % species = retrieveSpecies('Solid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
   plot(T,H,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
@@ -13,6 +14,6 @@ if(contains(get_param(gcbh,'Name'),'Properties Gas'))
   legend(species)
 else
   close all
-  warning('no Properties Gas Block selected\n');
+  warning('no Properties Solid Block selected\n');
 end
 end

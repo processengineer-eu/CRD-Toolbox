@@ -30,6 +30,7 @@ component Sorption
       UIGroup('Thermodynamics',dHads),...
       UIGroup('Stoichiometry',nu_L,nu_I),...
       UIGroup('Kinetics',kads,K0,g)];
+    c : LoggingUnit = 'mol/l';
   end
 
   parameters(Access = private)
@@ -105,7 +106,7 @@ component Sorption
     x = checkMoleFractions(Port_B_L.x);
     c = getConc(x,getProperty_T(Port_B_L.table_T,Port_B_L.table_Vm,T));
 
-    sc =  (1*(nu_L ~= 0))'*value(c,'mol/l');
+    sc = (1*(nu_L ~= 0))'*value(c,'mol/l');
     sTheta = (1*(nu_I ~= 0))'*Theta;
     Theta0 = max_noZC(1-sum(Theta),eps);
     n = sum(snu_I,1)';
@@ -136,6 +137,10 @@ component Sorption
     end
   end
 
+ intermediates % only for logging
+   rr = r;
+ end
+ 
   equations
     F_L == A*nu_L*r;
     F_I == A*nu_I*r;

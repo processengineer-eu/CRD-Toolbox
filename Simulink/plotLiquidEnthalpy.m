@@ -1,14 +1,15 @@
-function plotLiquidHeatOfVaporization(~, callbackInfo)
+function plotLiquidEnthalpy(~, callbackInfo)
 if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
-  Hv = str2num(get_param(gcbh,'table_Hv'));
+  H = str2num(get_param(gcbh,'table_H'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Liquid',Ids);
-  plot(T,pvap,'linewidth',2.0)
+  % species = retrieveSpecies('Liquid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
+  plot(T,H,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
-  ylabel('H_{v} [kJ/mol]')
+  ylabel('H [kJ/mol]')
   grid on
   legend(species)
 else

@@ -1,14 +1,15 @@
-function plotGasHeatCapacity(~, callbackInfo)
+function plotGasViscosity(~, callbackInfo)
 if(contains(get_param(gcbh,'Name'),'Properties Gas'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
-  cp = str2num(get_param(gcbh,'table_cp'));
+  mu = str2num(get_param(gcbh,'table_mu'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Gas',Ids);
-  plot(T,cp,'linewidth',2.0)
+  % species = retrieveSpecies('Liquid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
+  plot(T,mu,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
-  ylabel('c_p [kJ/(mol*K)]')
+  ylabel('\mu [Pa*s]')
   grid on
   legend(species)
 else

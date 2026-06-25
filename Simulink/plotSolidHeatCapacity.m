@@ -4,7 +4,8 @@ if(contains(get_param(gcbh,'Name'),'Properties Solid'))
   T = str2num(get_param(gcbh,'table_T'));
   cp = str2num(get_param(gcbh,'table_cp'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Solid',Ids);
+  % species = retrieveSpecies('Solid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
   plot(T,cp,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')

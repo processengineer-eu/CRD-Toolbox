@@ -1,14 +1,15 @@
-function plotLiquidEnthalpy(~, callbackInfo)
+function plotLiquidHeatCapacity(~, callbackInfo)
 if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
-  H = str2num(get_param(gcbh,'table_H'));
+  cp = str2num(get_param(gcbh,'table_cp'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Liquid',Ids);
-  plot(T,H,'linewidth',2.0)
+  % species = retrieveSpecies('Liquid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
+  plot(T,cp,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
-  ylabel('H [kJ/mol]')
+  ylabel('c_p [kJ/(mol*K)]')
   grid on
   legend(species)
 else

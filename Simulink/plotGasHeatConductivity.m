@@ -1,10 +1,11 @@
-function plotLiquidHeatConductivity(~, callbackInfo)
-if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
+function plotGasHeatConductivity(~, callbackInfo)
+if(contains(get_param(gcbh,'Name'),'Properties Gas'))
   N = str2num(get_param(gcbh,'N'));
   T = str2num(get_param(gcbh,'table_T'));
   lambda = str2num(get_param(gcbh,'table_lambda'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Liquid',Ids);
+  % species = retrieveSpecies('Gas',Ids);
+  species = cellstr(strcat('A',string(Ids)))
   plot(T,lambda,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
@@ -13,6 +14,6 @@ if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
   legend(species)
 else
   close all
-  warning('no Properties Liquid Block selected\n');
+  warning('no Properties Gas Block selected\n');
 end
 end

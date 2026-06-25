@@ -4,7 +4,8 @@ if(contains(get_param(gcbh,'Name'),'Properties Liquid'))
   T = str2num(get_param(gcbh,'table_T'));
   G = str2num(get_param(gcbh,'table_G'));
   Ids = str2num(get_param(gcbh,'Ids'));
-  species = retrieveSpecies('Liquid',Ids);
+  % species = retrieveSpecies('Liquid',Ids);
+  species = cellstr(strcat('A',string(Ids)))
   plot(T,G,'linewidth',2.0)
   set(gca,'fontsize',16,'linewidth',1.6)
   xlabel('T [K]')
