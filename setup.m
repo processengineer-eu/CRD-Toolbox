@@ -1,9 +1,10 @@
 % %% Setup for CRD-Toolbox
 %
-%    (c) Klaus Schnitzlein - 18.06.2026
+%    (c) Klaus Schnitzlein - 25.06.2026
 
 fprintf('Setting Path to %s\n',pwd);
 addpath('.');
+addpath('Simulink');
 addpath(genpath('Functions')); 
 addpath(genpath('Icons')); 
 addpath(genpath('Data')); 
