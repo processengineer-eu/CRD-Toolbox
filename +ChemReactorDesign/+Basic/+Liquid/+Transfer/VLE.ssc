@@ -8,7 +8,7 @@ component VLE
   % VLE : 1.5
   % Vapor-Liquid Equilibrium VLE
   %
-  %   (c) Klaus Schnitzlein - 12.06.2026
+  %   (c) Klaus Schnitzlein - 25.06.2026
 
   nodes
     Port_B_G = Gas;     %
@@ -29,7 +29,7 @@ component VLE
     Port_B_L : Side = left;
     [Ain,Vin] : Side = top;
     UILayout = [...
-      UIGroup('Options',areaInput),...
+      UIGroup('Options',areaInput,mode),...
       UIGroup('Geometry',A0,V0),...
       UIGroup('Stoichiometry',nu_G,nu_L),...
       UIGroup('Kinetics',kV,kA)];
