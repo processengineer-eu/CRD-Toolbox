@@ -7,7 +7,7 @@ component (Hidden=true) BaseVolume
   % BaseVolume : 1.0 : fixed
   % Base Class for Volumes
   %
-  %   (c) Klaus Schnitzlein - 07.04.2026
+  %   (c) Klaus Schnitzlein - 01.07.2026
 
   inputs(ExternalAccess = none)
     pin = {1,'bar'}; % p
@@ -23,8 +23,13 @@ component (Hidden=true) BaseVolume
     Port_C = foundation.thermal.thermal;  %
   end
 
+  nodes(ExternalAccess = none)
+    Port_B = Solid; %
+  end
+
   annotations
     Port_A : Side = left;
+    Port_B : Side = right;
     Port_C : Side = bottom;
     [mout,Vout] : Side = top;
     H : LoggingUnit = 'kJ/mol';
@@ -35,6 +40,7 @@ component (Hidden=true) BaseVolume
     pressureInput = OnOff.Off;       % Pressure Input
     volumeOutput = OnOff.Off;        % Volume Output
     massOutput = OnOff.Off;          % Mass Output
+    enable2ndPort = OnOff.Off;       % Enable 2nd Port
     m0 = {[0;0],'g'};                % Initial Masses
     A0 = {10,'cm^2'};                % Sectional Area
     h0 = {0,'m'};                    % Geodetic Height
@@ -77,6 +83,12 @@ component (Hidden=true) BaseVolume
     end
   end
 
+  if(enable2ndPort == OnOff.On)
+    annotations
+      Port_B : ExternalAccess = modify;
+    end
+  end
+
   variables(Access = protected)
     F = {value={zeros(N,1),'mol/s'},nominal=Port_A.F_nom};
     Phi = {value={0,'W'},nominal=Port_A.Phi_nom};
@@ -103,7 +115,11 @@ component (Hidden=true) BaseVolume
     max_n = max_noZC(n,0); 
     x = max_n(1:N-1,1)/(sum(max_n)+{eps,'mol'});
   end
-  
+
+  connections
+    connect(Port_A,Port_B);
+  end
+
   equations
     n.der == F;
     V.der == sum(Vm.*F);
