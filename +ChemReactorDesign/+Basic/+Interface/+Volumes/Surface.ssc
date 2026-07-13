@@ -5,7 +5,7 @@ component Surface
   % Surface : 1.5 : fixed
   % Interface Area with constant size
   %
-  % (c) Klaus Schnitzlein - 28.07.2025
+  % (c) Klaus Schnitzlein - 29.06.2026
   
   nodes
     Port_A = Interface; % 
@@ -49,7 +49,7 @@ component Surface
 
   variables(Access = private)
     n = {value=reshape(Theta0,N,1)*A0./Port_A.Am,imin={0,'mol'},nominal=A0/Port_A.Am(1),priority=priority.high};
-    F = {zeros(N,1),'mol/s'};
+    F = {value={zeros(N,1),'mol/s'},nominal=Port_A.F_nom};
   end
 
   branches

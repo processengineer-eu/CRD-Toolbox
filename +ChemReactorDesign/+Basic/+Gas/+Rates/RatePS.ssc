@@ -9,7 +9,7 @@ component RatePS < BaseRate
   % RatePS : 1.5
   % Heterogeneous (Gas-Solid) Power Law Reaction Rate 
   %
-  %  (c) Klaus Schnitzlein - 15.01.2026
+  %  (c) Klaus Schnitzlein - 02.07.2026
 
   nodes
     Port_B_S = Solid;  %
