@@ -5,10 +5,10 @@ import ChemReactorDesign.Basic.Functions.*;
 component (Hidden = true) BaseTransport
   % Base Class for Mass and Heat Transport
   %
-  %   (c) Klaus Schnitzlein - 25.06.2025
+  %   (c) Klaus Schnitzlein - 30.06.2026
    
   inputs(ExternalAccess = none)
-    Ain = {0,'m^2'}; % S
+    Ain = {0,'m^2'}; % A
   end
 
   nodes
