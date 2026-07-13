@@ -7,7 +7,7 @@ component (Hidden=true) BaseVolume
   % BaseVolume : 1.0 : fixed
   % Base Class for Volumes
   %
-  %   (c) Klaus Schnitzlein - 14.02.2026
+  %   (c) Klaus Schnitzlein - 30.06.2026
 
   inputs(ExternalAccess = none)
     pin = {1,'bar'}; % p
@@ -62,6 +62,12 @@ component (Hidden=true) BaseVolume
   if(isothermalOperation == OnOff.On)
     annotations
       Port_C : ExternalAccess = none;
+    end
+  end
+
+  if(hydrostaticPressure == OnOff.Off)
+    annotations
+      h0 : ExternalAccess = none;
     end
   end
 
