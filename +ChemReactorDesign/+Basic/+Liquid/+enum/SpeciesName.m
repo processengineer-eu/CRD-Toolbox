@@ -6,16 +6,16 @@ classdef SpeciesName < int32
   enumeration
     None (0)
     H2O (1)
-		CH3OH (2)
+    CH3OH (2)
     C2H5OH (3)
     C3H6O (4)
     K_p (5)
-		Cl_m (6)
+    Cl_m (6)
     Cl2_aq (7)
-		Cu_2p (8)
-		SO4_2m (9)
-		FeCN6_3m (10)
-		FeCN6_4m (11)
+    Cu_2p (8)
+    SO4_2m (9)
+    FeCN6_3m (10)
+    FeCN6_4m (11)
     A1 (12)
     A2 (13)
     A3 (14)
@@ -34,23 +34,24 @@ classdef SpeciesName < int32
     C3H8O2 (27)
     A5 (28)
     A6 (29)
+    OH_m (30)
   end
+  
   methods (Static) 
-    
-		function map = displayText()
-			map = containers.Map;
-			map('None') = ' ';
+  function map = displayText()
+      map = containers.Map;
+      map('None') = ' ';
       map('H2O') = 'H2O';
       map('CH3OH') = 'CH3OH';
       map('C2H5OH') = 'C2H5OH';
       map('C3H6O') = 'C3H6O';
       map('K_p') = 'K^+';
-			map('Cl_m') = 'Cl^-';
+      map('Cl_m') = 'Cl^-';
       map('Cl2_aq') = 'Cl2(aq)';
-			map('Cu_2p') = 'Cu^2+';
-			map('SO4_2m') = 'SO4^2-';
-			map('FeCN6_3m') = 'Fe(CN)6^3-';
-			map('FeCN6_4m') = 'Fe(CN)6^4-';
+      map('Cu_2p') = 'Cu^2+';
+      map('SO4_2m') = 'SO4^2-';
+      map('FeCN6_3m') = 'Fe(CN)6^3-';
+      map('FeCN6_4m') = 'Fe(CN)6^4-';
       map('A1') = 'A1';
       map('A2') = 'A2';
       map('A3') = 'A3';
@@ -69,22 +70,23 @@ classdef SpeciesName < int32
       map('C3H8O2') = 'Glycerol';
       map('A5') = 'A5';
       map('A6') = 'A6';
-    end
-
-    function map = displayFileName()
-			map = containers.Map;
-			map('None') = ' ';
+      map('OH_m') = 'OH^-';
+  end
+  
+  function map = displayFileName()
+      map = containers.Map;
+      map('None') = ' ';
       map('H2O') = 'Water';
       map('CH3OH') = 'Methanol';
       map('C2H5OH') = 'Ethanol';
       map('C3H6O') = 'Acetone';
       map('K_p') = 'Potassium_cation';
-			map('Cl_m') = 'Chloride';
+      map('Cl_m') = 'Chloride';
       map('Cl2_aq') = 'Chlorine_aq';
-			map('Cu_2p') = 'Copper_cation2';
-			map('SO4_2m') = 'Sulfate_anion2';
-			map('FeCN6_3m') = 'HexacyanoferratIII';
-			map('FeCN6_4m') = 'HexacyanoferratII';
+      map('Cu_2p') = 'Copper_cation2';
+      map('SO4_2m') = 'Sulfate_anion2';
+      map('FeCN6_3m') = 'HexacyanoferratIII';
+      map('FeCN6_4m') = 'HexacyanoferratII';
       map('A1') = 'A1';
       map('A2') = 'A2';
       map('A3') = 'A3';
@@ -103,6 +105,7 @@ classdef SpeciesName < int32
       map('C3H8O2') = 'Glycerol';
       map('A5') = 'A5';
       map('A6') = 'A6';
+      map('OH_m') = 'Hydroxide_anion';
     end
-	end
+end
 end
