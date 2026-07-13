@@ -46,7 +46,7 @@ component SLE
   end
   
   parameters(ExternalAccess=none)
-    A0     = {0,'cm^2'};            % Area
+    A0 = {0,'cm^2'};            % Area
   end
   
   parameters(Access = private)

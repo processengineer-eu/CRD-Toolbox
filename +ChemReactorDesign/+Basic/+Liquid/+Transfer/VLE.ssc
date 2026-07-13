@@ -8,7 +8,7 @@ component VLE
   % VLE : 1.5
   % Vapor-Liquid Equilibrium VLE
   %
-  %   (c) Klaus Schnitzlein - 25.06.2026
+  %   (c) Klaus Schnitzlein - 30.06.2026
 
   nodes
     Port_B_G = Gas;     %
@@ -29,7 +29,7 @@ component VLE
     Port_B_L : Side = left;
     [Ain,Vin] : Side = top;
     UILayout = [...
-      UIGroup('Options',areaInput,mode),...
+      UIGroup('Options',areaInput,volumeInput,mode),...
       UIGroup('Geometry',A0,V0),...
       UIGroup('Stoichiometry',nu_G,nu_L),...
       UIGroup('Kinetics',kV,kA)];
@@ -47,8 +47,8 @@ component VLE
     mode = VLE_Operation.Boiling;    % Operation Mode 
     nu_L = {[-1;0],'1'};             % Stoichiometric Coefficients (Liquid)
     nu_G = {[1;0],'1'};              % Stoichiometric Coefficients (Gas)
-    kA = {0,'mol/(m^2*s)'};          % Rate Constants (Area Based)
-    kV = {0,'mol/(m^3*s)'};          % Rate Constants (Volume Based)
+    kA = {0,'mol/(m^2*s)'};          % Rate Constant (Area Based)
+    kV = {0,'mol/(m^3*s)'};          % Rate Constant (Volume Based)
   end
 
   parameters(ExternalAccess = none)
@@ -60,7 +60,7 @@ component VLE
   
   parameters(Access = private)
     Ids = Port_B_L.Ids;
-    VMin = {1.0e-10,'l'};
+    VMin = {1.0e-10,'cm^3'};
     AMin = {1.0e-10,'cm^2'};
   end
 
@@ -73,53 +73,63 @@ component VLE
       'invalid stoichiometric coefficients for liquid phase');
     assert(sum(sum(1*(nu_G == 1),1)) == M,...
       'invalid stoichiometric coefficents for gas phase');
-    assert(length(kA) == M,...
-      'invalid size of rate constants kA');
-    assert(length(kA) == M,...
-      'invalid size of rate constants kV');
   end
 
-  if(areaInput == OnOff.On)
-    equations
-      A  == Ain;
-    end
+  if(mode == VLE_Operation.Evaporation)
     annotations
-      Ain : ExternalAccess = modify;
-      A0 : ExternalAccess = none;
-    end
-  elseif(areaInput == OnOff.Off)
-    annotations
-      A0 : ExternalAccess = modify;
+      [kV,volumeInput] : ExternalAccess = none;
     end
     equations
-      A == A0;
+      assert(length(kA) == M,...
+        'invalid size of rate constants kA');
+    end
+    if(areaInput == OnOff.On)
+      intermediates
+        A = Ain;
+      end
+      annotations
+        Ain : ExternalAccess = modify;
+        A0 : ExternalAccess = none;
+      end
+    elseif(areaInput == OnOff.Off)
+      annotations
+        A0 : ExternalAccess = modify;
+      end
+      intermediates
+        A = A0;
+      end
+    end
+  else % mode == VLE_Operation.Boiling)
+    annotations
+      [kA,areaInput] : ExternalAccess = none;
+    end
+    equations
+      assert(length(kV) == M,...
+        'invalid size of rate constants kV');
+    end
+    if(volumeInput == OnOff.On)
+      intermediates
+        V = Vin;
+      end
+      annotations
+        Vin : ExternalAccess = modify;
+        V0 : ExternalAccess = none;
+      end
+    elseif(volumeInput == OnOff.Off)
+      annotations
+        V0 : ExternalAccess = modify;
+      end
+      intermediates
+        V = V0;
+      end
     end
   end
-
-  if(volumeInput == OnOff.On)
-    equations
-      V == Vin;
-    end
-    annotations
-      Vin : ExternalAccess = modify;
-      V0 : ExternalAccess = none;
-    end
-  elseif(volumeInput == OnOff.Off)
-    annotations
-      V0 : ExternalAccess = modify;
-    end
-    equations
-      V == V0;
-    end
-  end
-
+    
   variables(Access=private)
     F_G = {zeros(N_G,1),'mol/s'};
     Phi_G = {0,'W'};
     F_L = {zeros(N_L,1),'mol/s'};
     Phi_L = {0,'W'};
-    A  = {0,'m^2'};
-    V = {0,'m^3'};
   end
 
   branches
@@ -159,10 +169,14 @@ component VLE
     Hv = -(sel_G*H_G-sel_L*H_L);
   end
  
+  intermediates % only for logging
+    rlogging = r;
+  end
+
   if(mode == VLE_Operation.Boiling)
     intermediates
       lambda_L = regStep(V-VMin,1,0,VMin);
-      r = kV.*(tvap+tcond)*(rvap-rcond);
+      r = kV.*(tvap+tcond).*(rvap-rcond);
     end
     equations
       F_G == nu_G*V*r;
