@@ -7,14 +7,14 @@ import ChemReactorDesign.Basic.Liquid.enum.*;
 component (Hidden = true) BaseRate
   % Base Class for Liquid Rates
   %
-  %   (c) Klaus Schnitzlein - 17.11.2025
+  %   (c) Klaus Schnitzlein - 06.07.2026
    
   inputs(ExternalAccess = none)
     V = {0,'l'};    % V
     A = {0,'cm^2'}; % A
     m = {0,'g'};    % m
   end
-  
+
   nodes
     Port_B = Liquid; %
   end
@@ -75,12 +75,12 @@ component (Hidden = true) BaseRate
     annotations
       kappaf: ExternalAccess = modify;
     end
+    equations
+      assert(length(kappaf) == N);
+    end
     parameters
       row_kappaf = reshape(kappaf,N,1);
       row_kappab = {zeros(N,1),'1'};
-    end
-    equations
-      assert(length(kappaf) == N);
     end
   end
 
@@ -105,8 +105,10 @@ component (Hidden = true) BaseRate
     x = checkMoleFractions(Port_B.x);
     Vm = getProperty_T(Port_B.table_T,Port_B.table_Vm,T);
     c = getConc(x,Vm);
-    a = gamma.*max_noZC(c/{1,'mol/l'},eps); 
-    
+    ap = gamma.*max_noZC(c/{1,'mol/l'},eps);
+    % Assumption: Solvent = species(N)
+    a = [ap(1:N-1,1);gamma(N)*x(N)];
+
     kfinf = if(rateReference == RateReference.Volume),
       kfinfV*V
     elseif(rateReference == RateReference.Area),
