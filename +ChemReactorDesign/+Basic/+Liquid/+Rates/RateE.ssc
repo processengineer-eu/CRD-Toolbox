@@ -2,12 +2,13 @@ import ChemReactorDesign.Basic.Liquid.Rates.*;
 import ChemReactorDesign.Basic.Functions.*;
 import ChemReactorDesign.Basic.enum.*;
 
-component RateE < BaseRate(reversibility = Reversibility.Reversible,...
+component RateE < BaseRate(...
+    reversibility = Reversibility.Reversible,...
     rateReference = RateReference.Area)
   % RateE : 1.5
   % Electrochemical Reaction Rate (with zero-crossing prevention)
   %
-  %   (c) Klaus Schnitzlein - 13.05.2025
+  %   (c) Klaus Schnitzlein - 08.07.2026
 
   nodes
     Port_p = foundation.electrical.electrical; % +
@@ -32,7 +33,7 @@ component RateE < BaseRate(reversibility = Reversibility.Reversible,...
 
   parameters
     calculate_U0 = OnOff.Off;  % Calculate U0
-    alpha  = {0.5,'1'};        % Factor of Symmetry
+    alpha = {0.5,'1'};        % Factor of Symmetry
   end
 
   parameters(Access = private)
@@ -73,6 +74,6 @@ component RateE < BaseRate(reversibility = Reversibility.Reversible,...
     r == kf1*(exp(-alpha*n*f*eta)*lambdaf*prodf-...
               exp((1-alpha)*n*f*eta)*lambdab*prodb);
     i == -Port_B.Far*sum(z.*F);
- end
+  end
 
 end
