@@ -50,9 +50,10 @@ component RatePS < BaseRate
     lambdaf_S = (eq(sum(1*(lt(row_nu_S,0) & le(x_S,0))),0)); 
     lambdab_S = (eq(sum(1*(gt(row_nu_S,0) & le(x_S,0))),0)); 
     G_S = getProperty_T(Port_B_S.table_T,Port_B_S.table_G,T);
+    dGr_S = sum(row_nu_S.*G_S);
     Ka_S = if(reversibility == Reversibility.Reversible && ...
         calculate_Ka == simscape.enum.onoff.on)
-      exp(-(dGr + sum(row_nu_S.*G_S))/(Port_B.R*T))
+      exp(-(dGr + dGr_S)/(Port_B.R*T))
     else
       Ka0
     end;

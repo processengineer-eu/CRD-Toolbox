@@ -1,4 +1,4 @@
-
+import ChemReactorDesign.Basic.enum.*;
 import ChemReactorDesign.Basic.Gas.Transport.*;
 
 component ConvectionV < BaseConvection
@@ -6,23 +6,50 @@ component ConvectionV < BaseConvection
   % Velocity Induced Convective Mass and Heat Transport
   %   - at Upstream Conditions
   %
-  %   (c) Klaus Schnitzlein - 08.07.2025
+  %   (c) Klaus Schnitzlein - 17.07.2026
 
+  inputs(ExternalAccess = none)
+    qin = {0,'l/s'}; % q
+  end
+  
   annotations
     Icon = './ConvectionV.svg';
-    yin : Side = top;
-    [A0,delta,areaInput,checkValve] : ExternalAccess = none;
+    qin : Side = top;
+    [A0,delta,areaInput,flowOutput,checkValve] : ExternalAccess = none;
     UILayout = [...
-      UIGroup('Options',controlInput),...
+      UIGroup('Options',flowInput,controlInput),...
       UIGroup('MassTransport',q0)];
   end
 
   parameters
     q0 = {0,'cm^3/min'}; % Volumetric Flow Rate
+    flowInput = OnOff.Off; % Flow Rate Input
   end
 
-  equations
-    q == y*q0;
+  if(flowInput == OnOff.On)
+    annotations
+      q0 : ExternalAccess = none;
+      qin : ExternalAccess = modify;
+    end
+    if(controlInput == OnOff.On)
+      equations
+        q == y*qin;
+      end
+    else
+      equations
+        q == qin;
+      end
+    end
+  else
+    if(controlInput == OnOff.On)
+      equations
+        q == y*q0;
+      end
+    else
+      equations
+        q == q0;
+      end
+    end
   end
-
+  
 end
