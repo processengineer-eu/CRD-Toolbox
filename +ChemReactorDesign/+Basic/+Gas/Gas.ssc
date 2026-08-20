@@ -6,7 +6,7 @@ domain Gas
   % Gas Domain
   % Definition of a Gas Mixture 
   %
-  %   (c) Klaus Schnitzlein - 27.02.2026
+  %   (c) Klaus Schnitzlein - 10.08.2026
 
   parameters
     model = ThermodynamicModel.IdealGas;   % Thermodynamic Model
@@ -40,13 +40,13 @@ domain Gas
   end
   
   variables
-    x = {value={zeros(N-1,1),'1'},imin={0,'1'},imax={1,'1'}}; % Mole Fractions
-    p = {value={1.0,'bar'}};                         % Pressure
-    T = {value={298.15,'K'},imin={0,'K'}};           % Temperature
-    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom}; % Molar Enthalpies
-    Hres = {value={0,'kJ/mol'},nominal=Hres_nom};    % Residual Mixture Enthalpy
-    phi = {value={ones(N,1),'1'},imin={0,'1'}};      % Fugacity Coefficients
-    z = {value={1,'1'},imin={0,'1'}};                % Compressibility
+    x = {value={zeros(N-1,1),'1'},imin={0,'1'},imax={1,'1'},nominal={1,'1'}}; % Mole Fractions
+    p = {value={1.0,'bar'},nominal={1,'bar'}};                                % Pressure
+    T = {value={298.15,'K'},imin={0,'K'},nominal={298.15,'K'}};               % Temperature
+    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};                          % Molar Enthalpies
+    Hres = {value={0,'kJ/mol'},nominal=Hres_nom};                             % Residual Mixture Enthalpy
+    phi = {value={ones(N,1),'1'},imin={0,'1'},nominal={1,'1'}};               % Fugacity Coefficients
+    z = {value={1,'1'},imin={0,'1'},nominal={1,'1'}};                         % Compressibility
   end
   
   variables(Balancing = true)
