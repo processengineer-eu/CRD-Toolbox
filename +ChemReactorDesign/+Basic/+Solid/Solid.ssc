@@ -4,7 +4,7 @@ domain Solid
   % Solid Domain
   % Definition of a Solid Mixture
   %
-  %   (c) Klaus Schnitzlein - 18.08.2026
+  %   (c) Klaus Schnitzlein - 17.11.2025
 
   parameters
     N  = {2,'1'};                          % Number of Species
@@ -25,10 +25,10 @@ domain Solid
 end
 
   variables
-    x = {value={zeros(N-1,1),'1'},imin={0,'1'},imax={1,'1'},nominal={1,'1'}}; % Mole Fractions
-    p = {value={1.0,'bar'},nominal={1,'bar'}};                                % Pressure
-    T = {value={298.15,'K'},imin={0,'K'},nominal={298.15,'K'}};               % Temperature
-    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};                          % Molar Enthalpies
+    x = {value={zeros(N-1,1),'1'},imin={0,'1'},imax={1,'1'}}; % Mole Fractions
+    p = {value={1.0,'bar'}};             % Pressure
+    T = {298.15,'K'};                    % Temperature
+    H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};   % Molar Enthalpies
  end
   
   variables(Balancing = true)
