@@ -36,7 +36,7 @@ domain Liquid
   end
 
   variables
-    x = {value={zeros(N-1,1),'1'},imax={1,'1'}}; % Mole Fractions
+    x = {value={zeros(N-1,1),'1'},imax={1,'1'}}; % ,nominal={1.0e-03,'1'}}; % Mole Fractions
     p = {value={1,'bar'},nominal={1,'bar'}};                            % Pressure
     T = {value={298.15,'K'},imin={0,'K'},nominal={298.15,'K'}};    % Temperature
     H = {value={zeros(N,1),'kJ/mol'},nominal=H_nom};        % Molar Enthalpies

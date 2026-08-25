@@ -43,7 +43,7 @@ component Ergun < ConvectionP(...
 
   intermediates
     por = if(porosityInput == OnOff.On), 
-      max_noZC(epsbIn,eps); 
+      max_noZC(epsbIn,eps);
     else 
       epsb 
     end;
