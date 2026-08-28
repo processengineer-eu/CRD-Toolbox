@@ -7,7 +7,7 @@ function EoS_data = PengRobinson(table_zdd,x,p,T,pc,Tc,w,k)
   % cf. [Sandler eq.9.4-10 p.423]
   %
   %   (c) Antonio Brandao, 2009 MatlabExchange
-  %       Klaus Schnitzlein - 04.06.2025
+  %       Klaus Schnitzlein - 27.08.2026
 
   % Inputs: alle Größen sind dimensionslos
   % x   = mole fractions of all components (n x 1 column vector) 
@@ -63,10 +63,14 @@ function EoS_data = PengRobinson(table_zdd,x,p,T,pc,Tc,w,k)
 end
 
 function val = max3_noZC(a,b,c)
-  % max function without zero crossings
   definitions
-    val = if(gt(a,b) && gt(a,c))
-      a
-    elseif(gt(b,c)), b else c end
+    val = if(gt(b,a)) 
+      b 
+    elseif(gt(c,a)), 
+      c 
+    else 
+      a;
+    end
   end
 end
+

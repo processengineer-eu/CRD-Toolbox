@@ -35,7 +35,7 @@ domain Gas
     Hres_nom = {1.0,'kJ/mol'};             % Nominal Value for Departure Enthalpy
   end
   
-  parameters % (Access = private)
+  parameters 
     table_zdd = {generateCubicTable(),'1'}; % Table for Cubic Root Interpolation
   end
   

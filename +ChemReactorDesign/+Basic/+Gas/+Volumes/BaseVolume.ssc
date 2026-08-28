@@ -33,7 +33,6 @@ component (Hidden=true) BaseVolume
 
   parameters
     isothermalOperation = OnOff.On;  % Isothermal Operation
-    compressionWork = OnOff.On;      % Compression Work
     enable2ndPort = OnOff.Off;       % Enable 2nd Port
     V0 = {1,'l'};          % Volume
     x0 = {[0;1],'1'};      % Initial Mole Fractions
@@ -63,7 +62,7 @@ component (Hidden=true) BaseVolume
     F = {value = {zeros(N,1),'mol/s'},nominal = Port_A.F_nom};
     Phi = {value = {0,'W'},nominal = Port_A.Phi_nom};
     Q = {value = {0,'W'},nominal = Port_A.Q_nom};
-    T = {value = T0,nominal = T0,priority = priority.high}; % changed
+    T = {value = T0,nominal = T0,priority = priority.high}; 
   end
 
   branches

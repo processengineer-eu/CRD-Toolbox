@@ -10,7 +10,7 @@ component Valve < ConvectionP(...
   % Valve : 1.5
   % Convective Mass Transport through a valve
   %
-  %   (c) Klaus Schnitzlein - 11.02.2026
+  %   (c) Klaus Schnitzlein - 27.08.2026
   
   annotations
     Icon = './Valve.svg';
@@ -29,7 +29,7 @@ component Valve < ConvectionP(...
 
   intermediates
     Cd = sqrt(n/2); % relative capacity coefficient
-    rho = if(deltap >= 0),
+    rho = if(ge(deltap,0)),
       sum(xA.*Port_A.Mw).*pA/(R*TA)
     else
       sum(xB.*Port_A.Mw).*pB/(R*TB)

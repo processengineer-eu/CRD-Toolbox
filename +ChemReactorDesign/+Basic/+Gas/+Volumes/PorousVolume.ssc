@@ -24,7 +24,7 @@ component PorousVolume < BaseVolume
    mout : Side = top;
    Icon = './PorousVolume.svg';
    UILayout = [...
-     UIGroup('Options',volumeInputOutput,massOutput,isothermalOperation,compressionWork,enable2ndPort),...
+     UIGroup('Options',volumeInputOutput,massOutput,isothermalOperation,enable2ndPort),...
      UIGroup('Geometry',V0),...
      UIGroup('Solid',epsb,cps,rhos),...
      UIGroup('OperatingConditions',x0,p0,T0),...
@@ -78,14 +78,9 @@ component PorousVolume < BaseVolume
       T.der == 0;
     end
   else
-    if(compressionWork == OnOff.On)
-      equations
-        sum(F.*H) + sum(F)*Hres + (sum(n.*cp) + V*(1-epsb)*rhos*cps)*T.der == Phi + Q + epsb*V*p.der 
-      end
-    else
-      equations
-        sum(F.*H) + sum(F)*Hres + (sum(n.*cp) + V*(1-epsb)*rhos*cps)*T.der == Phi + Q 
-      end
+    equations
+      sum(F.*(H-z*R*T)) + sum(F)*Hres + ...
+        (sum(n.*(cp-z*R))+V*(1-epsb)*rhos*cps)*T.der == Phi + Q; % explizite Formulierung
     end
   end
 
@@ -100,14 +95,7 @@ component PorousVolume < BaseVolume
 
   equations
     n.der == F;
-    % p.der == z*R/(epsb*V)*(sum(n)*T.der+T*sum(F)); % Annahme: dz/dt = 0 funktioniert nicht
-    p == z*R*T/(epsb*V)*sum(nn);
-    % V == if(volumeInputOutput == InOut.Input),
-    %   Vin
-    % else
-    %   V0
-    % end;
-    
+    p == z*sum(nn)*R*T/(epsb*V);
     Vout == V;
     mout == (1-epsb)*V*rhos;
     Port_A.x == nn(1:N-1,1)/(sum(nn)+{eps,'mol'});

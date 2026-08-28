@@ -8,7 +8,7 @@ component ClosedVolume < BaseVolume
   % Closed Volume : 1.5 : fixed
   % Closed Homogeneous Gas Volume
   %
-  %   (c) Klaus Schnitzlein - 26.03.2026
+  %   (c) Klaus Schnitzlein - 28.08.2026
   %
 
   inputs(ExternalAccess = none)
@@ -19,16 +19,15 @@ component ClosedVolume < BaseVolume
     Vin : Side = top;
     Icon = './Volume.svg';
     UILayout = [...
-      UIGroup('Options',volumeInputOutput,isothermalOperation,compressionWork,enable2ndPort),...
+      UIGroup('Options',volumeInputOutput,isothermalOperation,enable2ndPort),...
       UIGroup('Geometry',V0),...
       UIGroup('OperatingConditions',x0,p0,T0),...
-      UIGroup('NominalValues',n_nom)]; % V_nom
+      UIGroup('NominalValues',n_nom)];
     n : LoggingUnit = 'mol';
   end
 
   parameters
     volumeInputOutput = InOut.Off; % Volume Input/Output
-    % V_nom = {1,'l'};   % Nominal Value for Volume
     n_nom = {1,'mol'}; % Nominal Value for Number of Moles
   end
  
@@ -50,27 +49,20 @@ component ClosedVolume < BaseVolume
   variables(Access = protected)
     n = {value = row_x0*n0,imin = {0,'mol'},nominal = n_nom};
     p = {value = p0,priority = priority.high};
-    % V = {value = V0,nominal = V_nom};
   end
 
   equations(Initial = true)
-    n == row_x0*p0*V/(z*R*T0); 
+    n == row_x0*p*V/(z*R*T); 
   end
   
   if(isothermalOperation == OnOff.On)
     equations
-      T.der == 0;
+      der(T) == 0;
     end
   else
-    if(compressionWork == OnOff.On)
-      equations
-        sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q + V*p.der;
-        % sum(F.*(H-R/z*T)) + sum(F)*Hres + sum(n.*(cp-R/z))*T.der == Phi + Q; % explizite Formulierung
-      end
-    else
-      equations
-        sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q;
-      end
+    equations
+      % sum(F.*H) + sum(F)*Hres + sum(n.*cp)*T.der == Phi + Q + V*der(p); % implicit
+      sum(F.*(H-z*R*T)) + sum(F)*Hres + sum(n.*(cp-z*R))*der(T) == Phi + Q; % explicit
     end
   end
 
@@ -84,15 +76,8 @@ component ClosedVolume < BaseVolume
   end
 
   equations
-    n.der == F;
-    p == z*R*T/V*sum(nn);
-
-    % und wenn ich V als intermediate definiere??
-    % V == if(volumeInputOutput == InOut.Input),
-    %   max_noZC(Vin,{eps,'l'})
-    % else
-    %   V0;
-    % end;
+    der(n) == F;
+    p*V == z*R*T*sum(nn);
     Vout == V;
     Port_A.x == nn(1:N-1,1)/(sum(nn)+{eps,'mol'});
     Port_A.p == p;
